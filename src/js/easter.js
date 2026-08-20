@@ -17,6 +17,7 @@ let running = false
 let lastT = 0
 let logged = false
 let grabbed = null
+const TOUCH = window.matchMedia('(hover: none)').matches
 
 function ensureField() {
   if (field) return field
@@ -39,13 +40,26 @@ function ensureField() {
     grabbed.y = ny
     grabbed.gt = now
   })
-  document.addEventListener('pointerup', () => {
+  const release = () => {
     if (!grabbed) return
     grabbed.el.style.cursor = 'grab'
     grabbed.grabbedNow = false
     grabbed.born = performance.now() // a caught body gets a fresh life
     grabbed = null
-  })
+  }
+  document.addEventListener('pointerup', release)
+  // a touch turning into a scroll fires pointercancel — without this the
+  // body stays "in hand" forever, frozen mid-air
+  document.addEventListener('pointercancel', release)
+
+  // the field is viewport-fixed, so bodies would ride along over every
+  // section — once the reader scrolls on, let them sink away
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY
+    for (const h of heads) {
+      if (!h.grabbedNow && Math.abs(y - h.spawnScroll) > window.innerHeight * 0.35) h.phantom = true
+    }
+  }, { passive: true })
   return field
 }
 
@@ -61,7 +75,8 @@ function spawn(src, x0, y0, opts = {}) {
   el.src = src
   el.alt = ''
   el.draggable = false
-  el.style.cssText = `position:absolute;left:0;top:0;width:${r * 2}px;will-change:transform;pointer-events:auto;cursor:grab;user-select:none;-webkit-user-drag:none`
+  // on touch, bodies must not swallow the finger — scrolling wins over grabbing
+  el.style.cssText = `position:absolute;left:0;top:0;width:${r * 2}px;will-change:transform;pointer-events:${TOUCH ? 'none' : 'auto'};cursor:grab;user-select:none;-webkit-user-drag:none`
   f.appendChild(el)
 
   const x = Math.min(Math.max(x0 ?? W / 2, r + 4), W - r - 4)
@@ -76,6 +91,7 @@ function spawn(src, x0, y0, opts = {}) {
     grabbedNow: false,
     born: performance.now(),
     life: LIFE_MS + Math.random() * 4000,
+    spawnScroll: window.scrollY,
     gt: 0,
   }
   heads.push(head)

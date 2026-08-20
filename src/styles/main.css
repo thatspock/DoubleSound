@@ -533,5 +533,20 @@ a.badge-pill:hover { background: var(--black); color: var(--green); border-color
   .f-final { grid-area: 8 / 1 / 9 / 7; margin-top: calc(40rem / var(--sr)); flex-wrap: wrap; }
   .f-final h1 { font-size: calc(56rem / var(--sr)); margin-bottom: 0; order: -1; width: 100%; text-align: center; }
 
+  /* desktop spacing keeps its px size on a phone and reads twice as
+     heavy — compress the vertical rhythm across all sections */
+  .hero-copy { margin: calc(48rem / var(--sr)) 0 calc(16rem / var(--sr)); }
+  .lineup { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
+  .lineup-head { margin-bottom: calc(44rem / var(--sr)); }
+  .facts { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
+  .facts-head { margin-bottom: calc(44rem / var(--sr)); }
+  .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
+  .footer-grid { padding-top: calc(48rem / var(--sr)); }
+  .f-badges { margin-top: calc(28rem / var(--sr)); }
+  .f-final { margin-top: calc(28rem / var(--sr)); }
+  /* -8rem tracking is fine at 210rem, but at phone scale it collapses
+     the wordmark into a smear — keep the same -3.8% of the em instead */
+  .f-final h1 { letter-spacing: calc(-2rem / var(--sr)); }
+
   .sticky-name, .scrollbar { display: none; }
 }

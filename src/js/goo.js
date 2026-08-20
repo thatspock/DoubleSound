@@ -58,7 +58,9 @@ export function initGooReveals(scope = document) {
     const tl = gooRevealTween(el)
     ScrollTrigger.create({
       trigger: el,
-      start: 'top 88%',
+      // clamp keeps the trigger reachable for elements at the very bottom
+      // of the page (the closing wordmark never crossed the 88% line)
+      start: 'clamp(top 88%)',
       once: true,
       onEnter: () => tl.play(),
     })
