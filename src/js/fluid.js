@@ -101,6 +101,11 @@ export function initFluidReveal({ onHeartClick } = {}) {
   const pointer = { x: -1, y: -1, px: -1, py: -1, lastMove: 0 }
   let cleanTick = 0
 
+  // canvas SVG-filter support (Safari lacks it — fall back to alpha stacking)
+  mctx.filter = 'url(#fluid-step)'
+  const hasStepFilter = mctx.filter !== 'none'
+  mctx.filter = 'none'
+
   // 8-bit alpha quantization makes multiplicative fade stall on faint
   // tails, and the threshold pumps them back up — sweep them to zero
   function sweepFaintTails() {
@@ -125,7 +130,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   function frame(t) {
     // no ghost layer — the reveal simply melts away, water-like
     tctx.globalCompositeOperation = 'destination-out'
-    tctx.fillStyle = 'rgba(0,0,0,0.024)'
+    tctx.fillStyle = 'rgba(0,0,0,0.018)'
     tctx.fillRect(0, 0, trail.width, trail.height)
     tctx.globalCompositeOperation = 'source-over'
 
@@ -158,16 +163,23 @@ export function initFluidReveal({ onHeartClick } = {}) {
       pointer.py = pointer.y
     }
 
-    // wide blur + very steep threshold ≈ near-binary metaball edge;
-    // the smoothing pass must REPLACE the mask ('copy'), not stack on
-    // top of it — otherwise the aliased staircase survives underneath
+    // wide blur, then a HARD alpha step: the edge is the 0.5 iso-line of
+    // the metaball field — binary, no partial-alpha skirt smearing over
+    // the video while the trail melts. A 1px pass anti-aliases the rim.
     mctx.clearRect(0, 0, mask.width, mask.height)
     mctx.filter = `blur(${mask.height * 0.02}px)`
     mctx.drawImage(trail, 0, 0, mask.width, mask.height)
-    mctx.filter = 'none'
-    for (let i = 0; i < 8; i++) mctx.drawImage(mask, 0, 0)
     mctx.globalCompositeOperation = 'copy'
-    mctx.filter = 'blur(1.2px)'
+    if (hasStepFilter) {
+      mctx.filter = 'url(#fluid-step)'
+      mctx.drawImage(mask, 0, 0)
+    } else {
+      mctx.filter = 'none'
+      mctx.globalCompositeOperation = 'source-over'
+      for (let i = 0; i < 8; i++) mctx.drawImage(mask, 0, 0)
+      mctx.globalCompositeOperation = 'copy'
+    }
+    mctx.filter = 'blur(1px)'
     mctx.drawImage(mask, 0, 0)
     mctx.filter = 'none'
     mctx.globalCompositeOperation = 'source-over'

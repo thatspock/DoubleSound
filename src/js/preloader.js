@@ -19,6 +19,8 @@ export function runPreloader() {
   const state = { p: 0 }
   const tl = gsap.timeline()
   tl.to(path, { morphSVG: HEART_D, duration: 1.5, ease: 'power2.inOut' }, 0)
+  // the face condenses in once the silhouette has (mostly) become a heart
+  tl.to('[data-pre-face]', { opacity: 1, duration: 0.5, ease: 'power2.out' }, 1.15)
   tl.to(state, {
     p: 100,
     duration: 1.5,

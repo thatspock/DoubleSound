@@ -105,6 +105,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   transform: translate(-50%, -50%);
   color: var(--white);
 }
+.pre-face { fill: var(--green); opacity: 0; }
 .pre-count {
   position: absolute;
   left: var(--pad); bottom: calc(8rem / var(--sr));

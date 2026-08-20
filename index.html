@@ -17,6 +17,12 @@
     <div class="pre-heart">
       <svg viewBox="0 0 1069 1154" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <path data-pre-path d="M0 0 L1069 0 L1069 1154 L0 1154 Z" fill="currentColor"></path>
+        <!-- flat face traced from the stone heart, punched out in bg green -->
+        <g class="pre-face" data-pre-face>
+          <path d="M236 165 L254 131 L272 108 L290 98 L308 97 L326 103 L344 111 L362 118 L379 127 L395 137 L395 149 L379 160 L362 173 L344 186 L326 195 L308 199 L290 200 L272 196 L254 186 L236 173 Z" />
+          <path d="M715 143 L733 115 L751 96 L769 89 L787 90 L805 95 L823 104 L840 117 L854 133 L865 152 L865 161 L854 168 L840 179 L823 191 L805 200 L787 205 L769 204 L751 197 L733 182 L715 162 Z" />
+          <path d="M216 698 L234 704 L252 710 L270 717 L288 722 L306 721 L324 701 L342 660 L360 609 L378 566 L396 544 L414 553 L432 590 L450 629 L468 654 L486 666 L504 672 L522 676 L540 679 L558 683 L576 686 L594 685 L612 683 L630 687 L648 703 L666 725 L684 738 L702 737 L719 730 L734 724 L747 720 L747 729 L734 737 L719 746 L702 756 L684 767 L666 777 L648 786 L630 793 L612 801 L594 809 L576 816 L558 820 L540 822 L522 824 L504 825 L486 826 L468 825 L450 823 L432 818 L414 813 L396 806 L378 798 L360 788 L342 778 L324 768 L306 760 L288 750 L270 739 L252 727 L234 715 L216 706 Z" />
+        </g>
       </svg>
     </div>
     <div class="pre-count h1" data-pre-count aria-hidden="true">0%</div>
@@ -40,6 +46,13 @@
       </a>
     </div>
   </nav>
+
+  <!-- hard alpha step for the fluid mask: a real threshold, not a soft ramp -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="fluid-step" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feComponentTransfer><feFuncA type="discrete" tableValues="0 1" /></feComponentTransfer>
+    </filter>
+  </svg>
 
   <!-- grid overlay -->
   <div class="grid-overlay" data-grid-overlay aria-hidden="true">
