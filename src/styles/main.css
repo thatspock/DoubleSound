@@ -414,7 +414,7 @@ a.badge-pill:hover { background: var(--black); color: var(--peach); border-color
   font-size: calc(210rem / var(--sr));
   letter-spacing: calc(-8rem / var(--sr));
   line-height: 0.8;
-  margin-bottom: calc(-46rem / var(--sr)); /* baseline sinks past the page edge */
+  margin-bottom: calc(-22rem / var(--sr)); /* baseline dips just past the page edge */
   white-space: nowrap;
 }
 .f-final .p1 { padding-bottom: calc(14rem / var(--sr)); }

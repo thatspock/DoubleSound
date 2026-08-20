@@ -27,7 +27,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   const content = document.createElement('canvas')
   const cctx = content.getContext('2d')
 
-  const TRAIL_SCALE = 0.18
+  const TRAIL_SCALE = 0.26
   let W = 0, H = 0
   let heartBox = null
 
@@ -94,8 +94,10 @@ export function initFluidReveal({ onHeartClick } = {}) {
     layer.height = H
     content.width = W
     content.height = H
-    mask.width = Math.round(W / 2)
-    mask.height = Math.round(H / 2)
+    // mask in CSS-pixel resolution: fine enough for liquid curves,
+    // cheap enough for per-frame GPU blurs
+    mask.width = Math.round(W / DPR)
+    mask.height = Math.round(H / DPR)
     maskOld.width = mask.width
     maskOld.height = mask.height
     gray.width = mask.width
@@ -134,7 +136,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   }
   function splat(x, y, r, a) {
     splatOn(tctx, x, y, r, a)
-    splatOn(toctx, x, y, r * 1.12, a * 0.8) // the ghost is a touch wider, but faint
+    splatOn(toctx, x, y, r, a * 0.75) // same footprint — no grey rim peeking out
   }
 
   function frame(t) {
@@ -177,19 +179,25 @@ export function initFluidReveal({ onHeartClick } = {}) {
       pointer.py = pointer.y
     }
 
-    // wide blur + very steep threshold ≈ near-binary metaball edge:
-    // big smooth waves, no muddy translucent rim
+    // wide blur + very steep threshold ≈ near-binary metaball edge,
+    // then a soft 1px pass to melt the staircase into a liquid rim
     mctx.clearRect(0, 0, mask.width, mask.height)
     mctx.filter = `blur(${mask.height * 0.02}px)`
     mctx.drawImage(trail, 0, 0, mask.width, mask.height)
     mctx.filter = 'none'
     for (let i = 0; i < 8; i++) mctx.drawImage(mask, 0, 0)
+    mctx.filter = 'blur(1.4px)'
+    mctx.drawImage(mask, 0, 0)
+    mctx.filter = 'none'
 
     moctx.clearRect(0, 0, maskOld.width, maskOld.height)
-    moctx.filter = `blur(${maskOld.height * 0.026}px)`
+    moctx.filter = `blur(${maskOld.height * 0.024}px)`
     moctx.drawImage(trailOld, 0, 0, maskOld.width, maskOld.height)
     moctx.filter = 'none'
     for (let i = 0; i < 6; i++) moctx.drawImage(maskOld, 0, 0)
+    moctx.filter = 'blur(1.4px)'
+    moctx.drawImage(maskOld, 0, 0)
+    moctx.filter = 'none'
 
     // cooled ghost: the old mask tinted light grey
     gctx.globalCompositeOperation = 'source-over'
