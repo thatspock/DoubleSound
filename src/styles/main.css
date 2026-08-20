@@ -137,12 +137,12 @@ sup { font-size: 0.55em; vertical-align: super; }
 .nav-cta {
   pointer-events: auto;
   background: var(--black);
-  color: var(--peach);
+  color: var(--green);
   border-radius: calc(18rem / var(--sr));
   padding: calc(5rem / var(--sr)) calc(10rem / var(--sr));
   transition: background var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 }
-.nav-cta:hover { background: var(--peach); color: var(--black); }
+.nav-cta:hover { background: var(--green); color: var(--white); }
 
 .nav-sound {
   pointer-events: auto;
@@ -150,13 +150,13 @@ sup { font-size: 0.55em; vertical-align: super; }
   width: calc(26rem / var(--sr));
   height: calc(26rem / var(--sr));
   background: var(--black);
-  color: var(--peach);
+  color: var(--green);
   border: none;
   border-radius: calc(5rem / var(--sr));
   cursor: pointer;
   transition: background var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 }
-.nav-sound:hover { background: var(--peach); color: var(--black); }
+.nav-sound:hover { background: var(--green); color: var(--white); }
 .nav-sound svg { width: calc(16rem / var(--sr)); height: calc(16rem / var(--sr)); }
 .nav-sound .snd-wave { display: none; }
 .nav-sound.is-on .snd-wave { display: block; }
@@ -344,6 +344,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   border-top: var(--stroke) solid var(--ink-strong);
   padding-top: calc(90rem / var(--sr));
 }
+/* 'years' descender must clear the ascenders of 'of double' below */
+.footer .hg h1 { line-height: 0.98; }
 .f-l1 { grid-area: 1 / 3 / 2 / 7; }
 .f-l2 { grid-area: 2 / 4 / 3 / 8; margin-top: calc(8rem / var(--sr)); }
 
@@ -364,11 +366,15 @@ sup { font-size: 0.55em; vertical-align: super; }
   color: var(--ink-strong);
 }
 .f-count h1 { font-variant-numeric: tabular-nums; }
+/* rolling digits: current value slides up, the next rides in from below */
+.cd-roll { position: relative; overflow: clip; }
+.cd-roll span { display: inline-block; }
+.cd-roll .cd-next { position: absolute; left: 0; top: 100%; }
 .f-logo-cell {
   width: calc(160rem / var(--sr));
   padding: calc(26rem / var(--sr)) calc(44rem / var(--sr));
   background: var(--black);
-  color: var(--peach);
+  color: var(--green);
   cursor: pointer;
 }
 .f-logo-cell svg { width: 100%; height: auto; display: block; }
@@ -399,8 +405,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   font-weight: 560;
   transition: background var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 }
-a.badge-pill:hover { background: var(--black); color: var(--peach); border-color: var(--black); }
-.badge-pill.is-solid { background: var(--black); color: var(--peach); border-color: var(--black); }
+a.badge-pill:hover { background: var(--black); color: var(--green); border-color: var(--black); }
+.badge-pill.is-solid { background: var(--black); color: var(--green); border-color: var(--black); }
 
 /* closing row: giant wordmark cropped by the page edge, meta in the corners */
 .f-final {
@@ -414,10 +420,30 @@ a.badge-pill:hover { background: var(--black); color: var(--peach); border-color
   font-size: calc(210rem / var(--sr));
   letter-spacing: calc(-8rem / var(--sr));
   line-height: 0.8;
-  margin-bottom: calc(-22rem / var(--sr)); /* baseline dips just past the page edge */
+  margin-bottom: 0; /* flush with the page edge, nothing clipped */
   white-space: nowrap;
 }
 .f-final .p1 { padding-bottom: calc(14rem / var(--sr)); }
+
+.fact-row[data-egg] { cursor: pointer; }
+
+/* collab mark: '×' is a modifier, not a letter — half-size, optically
+   centred on the cap height of K-30 */
+.x-mark { font-size: 0.5em; vertical-align: 0.26em; }
+
+/* ---------------- cursor hint (easter-egg affordance) ---------------- */
+.cursor-hint {
+  position: fixed; left: -100px; top: -100px; z-index: 90;
+  pointer-events: none;
+  background: var(--black); color: var(--green);
+  border-radius: calc(24rem / var(--sr));
+  padding: calc(7rem / var(--sr)) calc(14rem / var(--sr));
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(14%, -130%) rotate(-6deg) scale(0.6);
+  transition: opacity var(--dur-s) var(--ease-out), transform var(--dur-s) var(--ease-out);
+}
+.cursor-hint.is-on { opacity: 1; transform: translate(14%, -130%) rotate(-6deg) scale(1); }
 
 /* ---------------- sticky name ---------------- */
 .sticky-name {
@@ -504,7 +530,7 @@ a.badge-pill:hover { background: var(--black); color: var(--peach); border-color
   .f-meta { grid-area: 6 / 1 / 7 / 7; margin-top: calc(32rem / var(--sr)); }
   .f-badges { grid-area: 7 / 1 / 8 / 7; margin-top: calc(40rem / var(--sr)); }
   .f-final { grid-area: 8 / 1 / 9 / 7; margin-top: calc(40rem / var(--sr)); flex-wrap: wrap; }
-  .f-final h1 { font-size: calc(56rem / var(--sr)); margin-bottom: calc(-12rem / var(--sr)); order: -1; width: 100%; text-align: center; }
+  .f-final h1 { font-size: calc(56rem / var(--sr)); margin-bottom: 0; order: -1; width: 100%; text-align: center; }
 
   .sticky-name, .scrollbar { display: none; }
 }

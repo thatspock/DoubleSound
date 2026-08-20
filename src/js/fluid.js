@@ -3,6 +3,8 @@
 // Implementation: low-res trail buffer -> blurred & alpha-steepened mask
 // -> destination-in over the hidden layer. No WebGL needed.
 
+import { moveHint, showHint, hideHint } from './hint.js'
+
 const DPR = Math.min(window.devicePixelRatio || 1, 2)
 
 export function initFluidReveal({ onHeartClick } = {}) {
@@ -13,17 +15,10 @@ export function initFluidReveal({ onHeartClick } = {}) {
   const ctx = canvas.getContext('2d')
   const layer = document.createElement('canvas')
   const lctx = layer.getContext('2d')
-  // two trails: fresh (full-strength content) and old (cooled light-grey ghost)
   const trail = document.createElement('canvas')
   const tctx = trail.getContext('2d')
-  const trailOld = document.createElement('canvas')
-  const toctx = trailOld.getContext('2d')
   const mask = document.createElement('canvas')
   const mctx = mask.getContext('2d')
-  const maskOld = document.createElement('canvas')
-  const moctx = maskOld.getContext('2d')
-  const gray = document.createElement('canvas')
-  const gctx = gray.getContext('2d')
   const content = document.createElement('canvas')
   const cctx = content.getContext('2d')
 
@@ -51,11 +46,11 @@ export function initFluidReveal({ onHeartClick } = {}) {
     c.font = `560 ${H * 0.022}px 'Inter Tight Variable', Arial, sans-serif`
     const w = c.measureText(text).width + H * 0.028
     const h = H * 0.048
-    c.fillStyle = dark ? '#101010' : '#f2a98a'
+    c.fillStyle = dark ? '#101010' : '#5f9656'
     c.beginPath()
     c.roundRect(-w / 2, -h / 2, w, h, h / 2)
     c.fill()
-    c.fillStyle = dark ? '#f2a98a' : '#101010'
+    c.fillStyle = dark ? '#5f9656' : '#101010'
     c.textAlign = 'center'
     c.textBaseline = 'middle'
     c.fillText(text, 0, 1)
@@ -98,14 +93,8 @@ export function initFluidReveal({ onHeartClick } = {}) {
     // cheap enough for per-frame GPU blurs
     mask.width = Math.round(W / DPR)
     mask.height = Math.round(H / DPR)
-    maskOld.width = mask.width
-    maskOld.height = mask.height
-    gray.width = mask.width
-    gray.height = mask.height
     trail.width = Math.max(2, Math.round(W * TRAIL_SCALE))
     trail.height = Math.max(2, Math.round(H * TRAIL_SCALE))
-    trailOld.width = trail.width
-    trailOld.height = trail.height
     paintLayer()
   }
 
@@ -115,40 +104,30 @@ export function initFluidReveal({ onHeartClick } = {}) {
   // 8-bit alpha quantization makes multiplicative fade stall on faint
   // tails, and the threshold pumps them back up — sweep them to zero
   function sweepFaintTails() {
-    for (const [cv, cx] of [[trail, tctx], [trailOld, toctx]]) {
-      const id = cx.getImageData(0, 0, cv.width, cv.height)
-      const d = id.data
-      for (let i = 3; i < d.length; i += 4) {
-        if (d[i] > 0 && d[i] < 28) d[i] = Math.max(0, d[i] - 7)
-      }
-      cx.putImageData(id, 0, 0)
+    const id = tctx.getImageData(0, 0, trail.width, trail.height)
+    const d = id.data
+    for (let i = 3; i < d.length; i += 4) {
+      if (d[i] > 0 && d[i] < 28) d[i] = Math.max(0, d[i] - 7)
     }
+    tctx.putImageData(id, 0, 0)
   }
 
-  function splatOn(c, x, y, r, a) {
-    const g = c.createRadialGradient(x, y, 0, x, y, r)
+  function splat(x, y, r, a) {
+    const g = tctx.createRadialGradient(x, y, 0, x, y, r)
     g.addColorStop(0, `rgba(255,255,255,${a})`)
     g.addColorStop(1, 'rgba(255,255,255,0)')
-    c.fillStyle = g
-    c.beginPath()
-    c.arc(x, y, r, 0, Math.PI * 2)
-    c.fill()
-  }
-  function splat(x, y, r, a) {
-    splatOn(tctx, x, y, r, a)
-    splatOn(toctx, x, y, r, a * 0.75) // same footprint — no grey rim peeking out
+    tctx.fillStyle = g
+    tctx.beginPath()
+    tctx.arc(x, y, r, 0, Math.PI * 2)
+    tctx.fill()
   }
 
   function frame(t) {
-    // fresh trail cools quickly; the grey ghost lingers for a long while
+    // no ghost layer — the reveal simply melts away, water-like
     tctx.globalCompositeOperation = 'destination-out'
-    tctx.fillStyle = 'rgba(0,0,0,0.030)'
+    tctx.fillStyle = 'rgba(0,0,0,0.024)'
     tctx.fillRect(0, 0, trail.width, trail.height)
     tctx.globalCompositeOperation = 'source-over'
-    toctx.globalCompositeOperation = 'destination-out'
-    toctx.fillStyle = 'rgba(0,0,0,0.016)'
-    toctx.fillRect(0, 0, trailOld.width, trailOld.height)
-    toctx.globalCompositeOperation = 'source-over'
 
     if (++cleanTick % 10 === 0) sweepFaintTails()
 
@@ -179,33 +158,19 @@ export function initFluidReveal({ onHeartClick } = {}) {
       pointer.py = pointer.y
     }
 
-    // wide blur + very steep threshold ≈ near-binary metaball edge,
-    // then a soft 1px pass to melt the staircase into a liquid rim
+    // wide blur + very steep threshold ≈ near-binary metaball edge;
+    // the smoothing pass must REPLACE the mask ('copy'), not stack on
+    // top of it — otherwise the aliased staircase survives underneath
     mctx.clearRect(0, 0, mask.width, mask.height)
     mctx.filter = `blur(${mask.height * 0.02}px)`
     mctx.drawImage(trail, 0, 0, mask.width, mask.height)
     mctx.filter = 'none'
     for (let i = 0; i < 8; i++) mctx.drawImage(mask, 0, 0)
-    mctx.filter = 'blur(1.4px)'
+    mctx.globalCompositeOperation = 'copy'
+    mctx.filter = 'blur(1.2px)'
     mctx.drawImage(mask, 0, 0)
     mctx.filter = 'none'
-
-    moctx.clearRect(0, 0, maskOld.width, maskOld.height)
-    moctx.filter = `blur(${maskOld.height * 0.024}px)`
-    moctx.drawImage(trailOld, 0, 0, maskOld.width, maskOld.height)
-    moctx.filter = 'none'
-    for (let i = 0; i < 6; i++) moctx.drawImage(maskOld, 0, 0)
-    moctx.filter = 'blur(1.4px)'
-    moctx.drawImage(maskOld, 0, 0)
-    moctx.filter = 'none'
-
-    // cooled ghost: the old mask tinted light grey
-    gctx.globalCompositeOperation = 'source-over'
-    gctx.clearRect(0, 0, gray.width, gray.height)
-    gctx.drawImage(maskOld, 0, 0)
-    gctx.globalCompositeOperation = 'source-in'
-    gctx.fillStyle = '#f0f0f0'
-    gctx.fillRect(0, 0, gray.width, gray.height)
+    mctx.globalCompositeOperation = 'source-over'
 
     paintLayer() // video frame changes every tick
 
@@ -217,7 +182,6 @@ export function initFluidReveal({ onHeartClick } = {}) {
     cctx.globalCompositeOperation = 'source-over'
 
     ctx.clearRect(0, 0, W, H)
-    ctx.drawImage(gray, 0, 0, W, H)
     ctx.drawImage(content, 0, 0)
 
     requestAnimationFrame(frame)
@@ -230,7 +194,13 @@ export function initFluidReveal({ onHeartClick } = {}) {
     pointer.y = e.clientY - r.top
     if (pointer.px < 0) { pointer.px = pointer.x; pointer.py = pointer.y }
     pointer.lastMove = performance.now()
+    const inHeart = heartBox &&
+      pointer.x * DPR > heartBox.x && pointer.x * DPR < heartBox.x + heartBox.w &&
+      pointer.y * DPR > heartBox.y && pointer.y * DPR < heartBox.y + heartBox.h
+    hero.style.cursor = inHeart ? 'pointer' : ''
+    if (inHeart) { moveHint(e.clientX, e.clientY); showHint() } else hideHint()
   })
+  hero.addEventListener('pointerleave', hideHint)
   hero.addEventListener('click', (e) => {
     if (!heartBox || !onHeartClick) return
     const r = wrap.getBoundingClientRect()

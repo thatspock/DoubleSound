@@ -11,7 +11,8 @@ import { initGooReveals } from './js/goo.js'
 import { runPreloader } from './js/preloader.js'
 import { initFluidReveal } from './js/fluid.js'
 import { initCountdown } from './js/countdown.js'
-import { dropIka } from './js/easter.js'
+import { dropIka, dropEgg } from './js/easter.js'
+import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
 
@@ -33,6 +34,21 @@ document.querySelectorAll('[data-heart-spin]').forEach((el) => {
   el.addEventListener('click', () => {
     turns += 1
     gsap.to(el, { rotation: turns * 360, duration: 1.4, ease: 'elastic.out(1, 0.6)' })
+  })
+})
+
+// ---------- easter-egg affordance + facts-row eggs ----------
+// the same cursor pill marks every hidden hotspot: spin hearts, egg rows
+if (window.matchMedia('(hover: hover)').matches) {
+  document.querySelectorAll('[data-heart-spin], [data-egg]').forEach((el) => {
+    el.addEventListener('pointermove', (e) => { moveHint(e.clientX, e.clientY); showHint() })
+    el.addEventListener('pointerleave', hideHint)
+  })
+}
+document.querySelectorAll('[data-egg]').forEach((el) => {
+  el.addEventListener('click', (e) => {
+    if (e.target.closest('a')) return // row links still navigate
+    dropEgg(el.dataset.egg, e.clientX, e.clientY)
   })
 })
 

@@ -1,16 +1,15 @@
-// Easter egg: every click on the stone heart drops another Ika head.
-// Tiny 2D physics sim — gravity, floor at the bottom of the first screen
-// with a gentle mound in the middle so heads roll off to the sides, then
-// they phase out and sink. You can grab a head and throw it: it bounces
-// off the walls and the ceiling, and only ever leaves through the floor.
+// Easter eggs share one physics world: Ika heads dropped from the heart
+// and flat b/w sprites ejected from the facts rows all obey the same
+// gravity, roll off the same floor mound, can be grabbed and thrown,
+// bounce off walls/ceiling and only ever leave through the floor.
 
 const G = 2600            // px/s^2
 const REST_FLOOR = 0.42   // floor bounciness
 const REST_WALL = 0.55
-const REST_HEAD = 0.5     // head-vs-head bounciness
-const MAX_ACTIVE = 7      // pile size before heads start sinking
-const LIFE_MS = 8000      // settled life before a head sinks away
-const AR = 910 / 842      // head image h/w
+const REST_HEAD = 0.5     // body-vs-body bounciness
+const MAX_ACTIVE = 7      // pile size before bodies start sinking
+const LIFE_MS = 8000      // settled life before a body sinks away
+const AR_IKA = 910 / 842  // head image h/w
 
 let field = null
 let heads = []
@@ -21,10 +20,10 @@ let grabbed = null
 
 function ensureField() {
   if (field) return field
-  const hero = document.querySelector('.hero')
+  // viewport-fixed so eggs can spawn from any section, not just the hero
   field = document.createElement('div')
-  field.style.cssText = 'position:absolute;inset:0 0 auto 0;height:100svh;overflow:clip;z-index:5;pointer-events:none'
-  hero.appendChild(field)
+  field.style.cssText = 'position:fixed;inset:0;overflow:clip;z-index:60;pointer-events:none'
+  document.body.appendChild(field)
 
   document.addEventListener('pointermove', (e) => {
     if (!grabbed) return
@@ -44,36 +43,32 @@ function ensureField() {
     if (!grabbed) return
     grabbed.el.style.cursor = 'grab'
     grabbed.grabbedNow = false
-    grabbed.born = performance.now() // a caught head gets a fresh life
+    grabbed.born = performance.now() // a caught body gets a fresh life
     grabbed = null
   })
   return field
 }
 
-export function dropIka(clickX) {
+function spawn(src, x0, y0, opts = {}) {
   const f = ensureField()
   const W = f.clientWidth
   const H = f.clientHeight
-  const r = Math.min(H * 0.11, W * 0.09)
-
-  if (!logged) {
-    logged = true
-    console.log('%cIKA ON THE DECKS — catch him if you can', 'color:#f2a98a;background:#101010;padding:4px 10px;border-radius:10px;font-weight:bold')
-  }
+  const r = (opts.scale ?? 1) * Math.min(H * 0.11, W * 0.09)
+  const ar = opts.ar ?? 1
+  const hh = r * ar // half-height; (x, y) is the image center
 
   const el = document.createElement('img')
-  el.src = '/assets/head-ika.webp'
+  el.src = src
   el.alt = ''
   el.draggable = false
   el.style.cssText = `position:absolute;left:0;top:0;width:${r * 2}px;will-change:transform;pointer-events:auto;cursor:grab;user-select:none;-webkit-user-drag:none`
   f.appendChild(el)
 
-  const hh = r * AR // half-height; (x, y) is the image center
-  const x = Math.min(Math.max(clickX ?? W / 2, r + 4), W - r - 4)
+  const x = Math.min(Math.max(x0 ?? W / 2, r + 4), W - r - 4)
   const head = {
-    x, y: -hh - 10,
-    vx: (Math.random() - 0.5) * 160,
-    vy: 0,
+    x, y: y0 ?? -hh - 10,
+    vx: opts.vx ?? (Math.random() - 0.5) * 160,
+    vy: opts.vy ?? 0,
     a: (Math.random() - 0.5) * 0.6,
     va: (Math.random() - 0.5) * 2,
     r, hh, el,
@@ -96,7 +91,7 @@ export function dropIka(clickX) {
     el.style.cursor = 'grabbing'
   })
 
-  // pile overflow: the oldest solid head starts sinking
+  // pile overflow: the oldest solid body starts sinking
   const active = heads.filter((h) => !h.phantom && !h.grabbedNow)
   if (active.length > MAX_ACTIVE) active[0].phantom = true
 
@@ -107,7 +102,24 @@ export function dropIka(clickX) {
   }
 }
 
-// the ground has a gentle mound in the middle — heads roll off to the sides
+export function dropIka(clickX) {
+  if (!logged) {
+    logged = true
+    console.log('%cIKA ON THE DECKS — catch him if you can', 'color:#5f9656;background:#101010;padding:4px 10px;border-radius:10px;font-weight:bold')
+  }
+  spawn('/assets/head-ika.webp', clickX, undefined, { ar: AR_IKA })
+}
+
+// facts-row eggs pop out of the clicked row, then fall like everything else
+export function dropEgg(src, x, y) {
+  spawn(src, x, y, {
+    scale: 0.72,
+    vx: (Math.random() - 0.5) * 240,
+    vy: -(420 + Math.random() * 260),
+  })
+}
+
+// the ground has a gentle mound in the middle — bodies roll off to the sides
 function humpAt(x, W, H) {
   const u = (x - W / 2) / (W * 0.16)
   return H * 0.055 * Math.exp(-u * u)
@@ -147,14 +159,14 @@ function tick(t) {
         h.vx *= 0.985                  // rolling friction
         h.va = h.vx / h.r              // roll, don't slide
       }
-      // walls and ceiling bounce a thrown head back into the field
+      // walls and ceiling bounce a thrown body back into the field
       if (h.x < h.r) { h.x = h.r; h.vx = -h.vx * REST_WALL }
       if (h.x > W - h.r) { h.x = W - h.r; h.vx = -h.vx * REST_WALL }
       if (h.y < h.hh && h.vy < 0) { h.y = h.hh; h.vy = -h.vy * REST_WALL }
     }
   }
 
-  // circle-circle collisions (equal masses; a grabbed head is immovable)
+  // circle-circle collisions (equal masses; a grabbed body is immovable)
   for (let i = 0; i < heads.length; i++) {
     const A = heads[i]
     if (A.phantom) continue
@@ -184,7 +196,7 @@ function tick(t) {
     }
   }
 
-  // render + cull sunk heads
+  // render + cull sunk bodies
   heads = heads.filter((h) => {
     if (h.y - h.hh > H * 1.4) { h.el.remove(); return false }
     h.el.style.transform = `translate(${h.x - h.r}px, ${h.y - h.hh}px) rotate(${h.a}rad)`
