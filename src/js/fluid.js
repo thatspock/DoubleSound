@@ -26,6 +26,21 @@ export function initFluidReveal({ onHeartClick } = {}) {
   const gctx = gray.getContext('2d')
   const content = document.createElement('canvas')
   const cctx = content.getContext('2d')
+  // static noise that eats into the mask edges — jelly-torn rims
+  const noise = document.createElement('canvas')
+  const nctx = noise.getContext('2d')
+
+  function rebuildNoise() {
+    nctx.clearRect(0, 0, noise.width, noise.height)
+    const n = Math.round((noise.width * noise.height) / 900)
+    for (let i = 0; i < n; i++) {
+      const r = 2 + Math.random() * Math.random() * 16
+      nctx.fillStyle = `rgba(255,255,255,${0.35 + Math.random() * 0.65})`
+      nctx.beginPath()
+      nctx.arc(Math.random() * noise.width, Math.random() * noise.height, r, 0, Math.PI * 2)
+      nctx.fill()
+    }
+  }
 
   const TRAIL_SCALE = 0.14
   let W = 0, H = 0
@@ -104,6 +119,9 @@ export function initFluidReveal({ onHeartClick } = {}) {
     trail.height = Math.max(2, Math.round(H * TRAIL_SCALE))
     trailOld.width = trail.width
     trailOld.height = trail.height
+    noise.width = mask.width
+    noise.height = mask.height
+    rebuildNoise()
     paintLayer()
   }
 
@@ -141,26 +159,47 @@ export function initFluidReveal({ onHeartClick } = {}) {
       const vx = (pointer.x - pointer.px) * TRAIL_SCALE * DPR
       const vy = (pointer.y - pointer.py) * TRAIL_SCALE * DPR
       const speed = Math.min(Math.hypot(vx, vy), 18)
-      const base = trail.height * 0.17
-      for (let i = 0; i < 4; i++) {
-        const k = i / 4
-        splat(tx - vx * k * 2.4, ty - vy * k * 2.4, base * (0.75 + Math.random() * 0.5) + speed, 0.9)
+      const base = trail.height * 0.15
+      // jelly cluster: a core along the stroke + ragged satellites + stray blobs
+      for (let i = 0; i < 3; i++) {
+        const k = i / 3
+        splat(tx - vx * k * 2.4, ty - vy * k * 2.4, base * (0.7 + Math.random() * 0.5) + speed, 0.9)
+      }
+      for (let i = 0; i < 3; i++) {
+        const ang = Math.random() * Math.PI * 2
+        const dist = base * (0.7 + Math.random() * 0.9)
+        splat(tx + Math.cos(ang) * dist, ty + Math.sin(ang) * dist, base * (0.25 + Math.random() * 0.4), 0.85)
+      }
+      if (Math.random() < 0.12) {
+        const ang = Math.random() * Math.PI * 2
+        const dist = base * (1.8 + Math.random() * 1.2)
+        splat(tx + Math.cos(ang) * dist, ty + Math.sin(ang) * dist, base * (0.18 + Math.random() * 0.25), 0.8)
       }
       pointer.px = pointer.x
       pointer.py = pointer.y
     }
 
-    // steepen alpha into torn-edged goo masks
+    // steepen alpha into torn-edged goo masks; noise gnaws the rims
     mctx.clearRect(0, 0, mask.width, mask.height)
-    mctx.filter = `blur(${mask.height * 0.014}px)`
+    mctx.filter = `blur(${mask.height * 0.011}px)`
     mctx.drawImage(trail, 0, 0, mask.width, mask.height)
     mctx.filter = 'none'
-    for (let i = 0; i < 4; i++) mctx.drawImage(mask, 0, 0)
+    mctx.globalCompositeOperation = 'destination-out'
+    mctx.globalAlpha = 0.5
+    mctx.drawImage(noise, 0, 0)
+    mctx.globalAlpha = 1
+    mctx.globalCompositeOperation = 'source-over'
+    for (let i = 0; i < 5; i++) mctx.drawImage(mask, 0, 0)
 
     moctx.clearRect(0, 0, maskOld.width, maskOld.height)
-    moctx.filter = `blur(${maskOld.height * 0.02}px)`
+    moctx.filter = `blur(${maskOld.height * 0.018}px)`
     moctx.drawImage(trailOld, 0, 0, maskOld.width, maskOld.height)
     moctx.filter = 'none'
+    moctx.globalCompositeOperation = 'destination-out'
+    moctx.globalAlpha = 0.35
+    moctx.drawImage(noise, 0, 0)
+    moctx.globalAlpha = 1
+    moctx.globalCompositeOperation = 'source-over'
     for (let i = 0; i < 3; i++) moctx.drawImage(maskOld, 0, 0)
 
     // cooled ghost: the old mask tinted light grey
