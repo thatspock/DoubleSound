@@ -20,6 +20,6 @@ System Log: Double Sound² ×K-30
 
 ⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘⫘
 `,
-    'font-size:10px;color:#5f9656;font-family:monospace;',
+    'font-size:10px;color:#609957;font-family:monospace;',
   )
 }

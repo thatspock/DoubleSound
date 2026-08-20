@@ -4,7 +4,7 @@
    sizes = calc(Npx as rem / scale-ratio))
 ------------------------------------------------------ */
 :root {
-  --green: #5f9656;
+  --green: #609957; /* sampled from the flyer background */
   --green-2: #548a4c;
   --peach: #f2a98a;
   --cream: #f6d0ae;
@@ -96,20 +96,20 @@ sup { font-size: 0.55em; vertical-align: super; }
 .preloader {
   position: fixed; inset: 0; z-index: 200;
   background: var(--green);
-  color: var(--peach);
+  color: var(--white);
 }
 .pre-heart {
   position: absolute;
   top: 50%; left: 50%;
   width: calc(150rem / var(--sr));
   transform: translate(-50%, -50%);
-  color: var(--peach);
+  color: var(--white);
 }
 .pre-count {
   position: absolute;
   left: var(--pad); bottom: calc(8rem / var(--sr));
   font-size: calc(200rem / var(--sr));
-  color: var(--peach);
+  color: var(--white);
 }
 .pre-tag {
   position: absolute;
