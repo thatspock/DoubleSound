@@ -52,18 +52,29 @@ export function gooRevealTween(el, opts = {}) {
   return tl
 }
 
+const tracked = []
+
 export function initGooReveals(scope = document) {
   const els = scope.querySelectorAll('[data-goo]')
   els.forEach((el) => {
     const tl = gooRevealTween(el)
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: el,
-      // clamp keeps the trigger reachable for elements at the very bottom
-      // of the page (the closing wordmark never crossed the 88% line)
-      start: 'clamp(top 88%)',
+      start: 'top 88%',
       once: true,
       onEnter: () => tl.play(),
     })
+    tracked.push({ st, tl })
+  })
+}
+
+// a trigger line at (or within a hair of) the page's max scroll can never
+// be crossed — the closing wordmark sat 3px shy of it and stayed hidden
+// forever. Once layout is final, play those outright.
+export function playUnreachableGoo() {
+  const max = ScrollTrigger.maxScroll(window)
+  tracked.forEach(({ st, tl }) => {
+    if (st.start > max - 48) { tl.play(); st.kill() }
   })
 }
 

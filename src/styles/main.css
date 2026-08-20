@@ -193,7 +193,9 @@ sup { font-size: 0.55em; vertical-align: super; }
 .heart-static { display: none; }
 
 .hero-inner {
-  position: relative; z-index: 1;
+  /* no z-index: a stacking context here would isolate the brand-cell's
+     difference blend from the reveal canvas underneath */
+  position: relative;
   padding: var(--pad);
   pointer-events: none;
 }
@@ -209,7 +211,10 @@ sup { font-size: 0.55em; vertical-align: super; }
 .brand-cell {
   grid-area: 1 / 3 / 2 / 4;
   min-height: calc(210rem / var(--sr));
-  color: var(--ink-strong);
+  /* white + difference: reads black on the white page, flips to white
+     wherever the dark reveal passes underneath — per-pixel, no triggers */
+  color: var(--white);
+  mix-blend-mode: difference;
 }
 .brand-logo { width: calc(64rem / var(--sr)); margin-bottom: calc(10rem / var(--sr)); }
 .brand-logo svg { width: 100%; height: auto; display: block; }

@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 
 import { HEART_D } from './js/heart-path.js'
-import { initGooReveals } from './js/goo.js'
+import { initGooReveals, playUnreachableGoo } from './js/goo.js'
 import { runPreloader } from './js/preloader.js'
 import { initFluidReveal } from './js/fluid.js'
 import { initCountdown } from './js/countdown.js'
@@ -145,4 +145,5 @@ document.querySelector('.heart-static')?.addEventListener('click', (e) => dropIk
 runPreloader().then(() => {
   lenis.start()
   ScrollTrigger.refresh()
+  playUnreachableGoo()
 })
