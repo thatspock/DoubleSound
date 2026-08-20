@@ -27,7 +27,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   const content = document.createElement('canvas')
   const cctx = content.getContext('2d')
 
-  const TRAIL_SCALE = 0.14
+  const TRAIL_SCALE = 0.18
   let W = 0, H = 0
   let heartBox = null
 
@@ -156,39 +156,40 @@ export function initFluidReveal({ onHeartClick } = {}) {
       const ty = pointer.y * TRAIL_SCALE * DPR
       const vx = (pointer.x - pointer.px) * TRAIL_SCALE * DPR
       const vy = (pointer.y - pointer.py) * TRAIL_SCALE * DPR
-      const speed = Math.min(Math.hypot(vx, vy), 18)
+      const speed = Math.min(Math.hypot(vx, vy), 22)
       const base = trail.height * 0.15
-      // jelly cluster: a core along the stroke + ragged satellites + stray blobs
+      // jelly cluster: a core along the stroke + a few big smooth lobes
       for (let i = 0; i < 3; i++) {
         const k = i / 3
-        splat(tx - vx * k * 2.4, ty - vy * k * 2.4, base * (0.7 + Math.random() * 0.5) + speed, 0.9)
+        splat(tx - vx * k * 2.4, ty - vy * k * 2.4, base * (0.75 + Math.random() * 0.4) + speed, 0.9)
       }
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 2; i++) {
         const ang = Math.random() * Math.PI * 2
-        const dist = base * (0.7 + Math.random() * 0.9)
-        splat(tx + Math.cos(ang) * dist, ty + Math.sin(ang) * dist, base * (0.25 + Math.random() * 0.4), 0.85)
+        const dist = base * (0.5 + Math.random() * 0.5)
+        splat(tx + Math.cos(ang) * dist, ty + Math.sin(ang) * dist, base * (0.45 + Math.random() * 0.3), 0.9)
       }
-      if (Math.random() < 0.12) {
+      if (Math.random() < 0.08) {
         const ang = Math.random() * Math.PI * 2
-        const dist = base * (1.8 + Math.random() * 1.2)
-        splat(tx + Math.cos(ang) * dist, ty + Math.sin(ang) * dist, base * (0.18 + Math.random() * 0.25), 0.8)
+        const dist = base * (1.6 + Math.random() * 0.8)
+        splat(tx + Math.cos(ang) * dist, ty + Math.sin(ang) * dist, base * (0.3 + Math.random() * 0.2), 0.85)
       }
       pointer.px = pointer.x
       pointer.py = pointer.y
     }
 
-    // steepen alpha into torn-edged goo masks
+    // wide blur + very steep threshold ≈ near-binary metaball edge:
+    // big smooth waves, no muddy translucent rim
     mctx.clearRect(0, 0, mask.width, mask.height)
-    mctx.filter = `blur(${mask.height * 0.011}px)`
+    mctx.filter = `blur(${mask.height * 0.02}px)`
     mctx.drawImage(trail, 0, 0, mask.width, mask.height)
     mctx.filter = 'none'
-    for (let i = 0; i < 5; i++) mctx.drawImage(mask, 0, 0)
+    for (let i = 0; i < 8; i++) mctx.drawImage(mask, 0, 0)
 
     moctx.clearRect(0, 0, maskOld.width, maskOld.height)
-    moctx.filter = `blur(${maskOld.height * 0.016}px)`
+    moctx.filter = `blur(${maskOld.height * 0.026}px)`
     moctx.drawImage(trailOld, 0, 0, maskOld.width, maskOld.height)
     moctx.filter = 'none'
-    for (let i = 0; i < 3; i++) moctx.drawImage(maskOld, 0, 0)
+    for (let i = 0; i < 6; i++) moctx.drawImage(maskOld, 0, 0)
 
     // cooled ghost: the old mask tinted light grey
     gctx.globalCompositeOperation = 'source-over'

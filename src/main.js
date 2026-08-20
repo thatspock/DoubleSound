@@ -93,6 +93,11 @@ if (stickyName) {
     x: () => -window.innerWidth * 0.28,
     scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true },
   })
+  // the giant closing wordmark takes over — the sticky name bows out
+  gsap.to(stickyName, {
+    autoAlpha: 0,
+    scrollTrigger: { trigger: '.f-final', start: 'top 95%', end: 'top 70%', scrub: true },
+  })
 }
 
 // ---------- custom scrollbar ----------

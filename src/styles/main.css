@@ -339,7 +339,7 @@ sup { font-size: 0.55em; vertical-align: super; }
 .tickets-note { color: var(--ink-strong); }
 
 /* ---------------- footer ---------------- */
-.footer { padding: calc(40rem / var(--sr)) var(--pad) calc(120rem / var(--sr)); }
+.footer { padding: calc(40rem / var(--sr)) var(--pad) 0; overflow: clip; }
 .footer-grid {
   border-top: var(--stroke) solid var(--ink-strong);
   padding-top: calc(90rem / var(--sr));
@@ -388,7 +388,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   grid-area: 6 / 3 / 7 / 7;
   display: flex; gap: calc(8rem / var(--sr));
   justify-content: center;
-  margin-top: calc(120rem / var(--sr));
+  margin-top: calc(56rem / var(--sr));
 }
 .badge-pill {
   border: var(--stroke) solid var(--ink-strong);
@@ -402,23 +402,22 @@ sup { font-size: 0.55em; vertical-align: super; }
 a.badge-pill:hover { background: var(--black); color: var(--peach); border-color: var(--black); }
 .badge-pill.is-solid { background: var(--black); color: var(--peach); border-color: var(--black); }
 
-/* giant closing name, like the reference's bottom wordmark */
-.f-name {
+/* closing row: giant wordmark cropped by the page edge, meta in the corners */
+.f-final {
   grid-area: 7 / 1 / 8 / 9;
-  display: flex; justify-content: center;
-  margin-top: calc(110rem / var(--sr));
-}
-.f-name h1 {
-  font-size: calc(190rem / var(--sr));
-  letter-spacing: calc(-7rem / var(--sr));
-}
-
-.f-bottom {
-  grid-area: 8 / 1 / 9 / 9;
-  display: flex; justify-content: space-between;
-  margin-top: calc(60rem / var(--sr));
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: calc(24rem / var(--sr));
+  margin-top: calc(70rem / var(--sr));
   color: var(--ink-strong);
 }
+.f-final h1 {
+  font-size: calc(210rem / var(--sr));
+  letter-spacing: calc(-8rem / var(--sr));
+  line-height: 0.8;
+  margin-bottom: calc(-46rem / var(--sr)); /* baseline sinks past the page edge */
+  white-space: nowrap;
+}
+.f-final .p1 { padding-bottom: calc(14rem / var(--sr)); }
 
 /* ---------------- sticky name ---------------- */
 .sticky-name {
@@ -503,10 +502,9 @@ a.badge-pill:hover { background: var(--black); color: var(--peach); border-color
   .f-r1 { grid-area: 5 / 3 / 6 / 7; }
   .f-r1 .f-indent { padding-left: calc(40rem / var(--sr)); }
   .f-meta { grid-area: 6 / 1 / 7 / 7; margin-top: calc(32rem / var(--sr)); }
-  .f-badges { grid-area: 7 / 1 / 8 / 7; margin-top: calc(48rem / var(--sr)); }
-  .f-name { grid-area: 8 / 1 / 9 / 7; margin-top: calc(56rem / var(--sr)); }
-  .f-name h1 { font-size: calc(64rem / var(--sr)); }
-  .f-bottom { grid-area: 9 / 1 / 10 / 7; margin-top: calc(32rem / var(--sr)); }
+  .f-badges { grid-area: 7 / 1 / 8 / 7; margin-top: calc(40rem / var(--sr)); }
+  .f-final { grid-area: 8 / 1 / 9 / 7; margin-top: calc(40rem / var(--sr)); flex-wrap: wrap; }
+  .f-final h1 { font-size: calc(56rem / var(--sr)); margin-bottom: calc(-12rem / var(--sr)); order: -1; width: 100%; text-align: center; }
 
   .sticky-name, .scrollbar { display: none; }
 }
