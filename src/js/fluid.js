@@ -72,7 +72,12 @@ export function initFluidReveal({ onHeartClick } = {}) {
   }
 
   const pointer = { x: -1, y: -1, px: -1, py: -1, lastMove: 0 }
-  const idle = { t: Math.random() * 100 }
+  // autonomous wanderers: the reveal lives and churns on its own,
+  // the mouse just tears it open wider
+  const drifters = [
+    { t: Math.random() * 100, fx: 1.3, fy: 0.9, ph: 1.7, r: 0.13 },
+    { t: Math.random() * 100, fx: 0.7, fy: 1.1, ph: 4.2, r: 0.1 },
+  ]
 
   function splat(x, y, r, a) {
     const g = tctx.createRadialGradient(x, y, 0, x, y, r)
@@ -87,9 +92,17 @@ export function initFluidReveal({ onHeartClick } = {}) {
   function frame(t) {
     // fade the trail slowly so the reveal oozes shut
     tctx.globalCompositeOperation = 'destination-out'
-    tctx.fillStyle = 'rgba(0,0,0,0.016)'
+    tctx.fillStyle = 'rgba(0,0,0,0.010)'
     tctx.fillRect(0, 0, trail.width, trail.height)
     tctx.globalCompositeOperation = 'source-over'
+
+    // wanderers churn all the time, mouse or not
+    for (const d of drifters) {
+      d.t += 0.0045
+      const ix = trail.width * (0.5 + 0.34 * Math.sin(d.t * d.fx) * Math.cos(d.t * 0.63 + d.ph))
+      const iy = trail.height * (0.42 + 0.3 * Math.sin(d.t * d.fy + d.ph))
+      splat(ix, iy, trail.height * d.r, 0.5)
+    }
 
     const now = performance.now()
     if (pointer.x >= 0 && now - pointer.lastMove < 90) {
@@ -97,20 +110,14 @@ export function initFluidReveal({ onHeartClick } = {}) {
       const ty = pointer.y * TRAIL_SCALE * DPR
       const vx = (pointer.x - pointer.px) * TRAIL_SCALE * DPR
       const vy = (pointer.y - pointer.py) * TRAIL_SCALE * DPR
-      const speed = Math.min(Math.hypot(vx, vy), 14)
-      const base = trail.height * 0.1
-      for (let i = 0; i < 3; i++) {
-        const k = i / 3
-        splat(tx - vx * k * 2, ty - vy * k * 2, base * (0.7 + Math.random() * 0.6) + speed, 0.5)
+      const speed = Math.min(Math.hypot(vx, vy), 18)
+      const base = trail.height * 0.17
+      for (let i = 0; i < 4; i++) {
+        const k = i / 4
+        splat(tx - vx * k * 2.4, ty - vy * k * 2.4, base * (0.75 + Math.random() * 0.5) + speed, 0.9)
       }
       pointer.px = pointer.x
       pointer.py = pointer.y
-    } else if (now - pointer.lastMove > 1800) {
-      // idle wander so the heart breathes even without a cursor
-      idle.t += 0.004
-      const ix = trail.width * (0.5 + 0.3 * Math.sin(idle.t * 1.3) * Math.cos(idle.t * 0.7))
-      const iy = trail.height * (0.42 + 0.26 * Math.sin(idle.t * 0.9 + 1.7))
-      splat(ix, iy, trail.height * 0.09, 0.24)
     }
 
     // steepen alpha into a torn-edged goo mask
@@ -152,13 +159,13 @@ export function initFluidReveal({ onHeartClick } = {}) {
   window.addEventListener('resize', resize)
   resize()
 
-  // welcome burst in the middle so the heart greets you
-  for (let i = 0; i < 14; i++) {
+  // welcome burst: the heart arrives mostly revealed
+  for (let i = 0; i < 26; i++) {
     splat(
-      trail.width * (0.5 + (Math.random() - 0.5) * 0.34),
-      trail.height * (0.42 + (Math.random() - 0.5) * 0.3),
-      trail.height * (0.06 + Math.random() * 0.09),
-      0.6,
+      trail.width * (0.5 + (Math.random() - 0.5) * 0.42),
+      trail.height * (0.42 + (Math.random() - 0.5) * 0.4),
+      trail.height * (0.1 + Math.random() * 0.14),
+      0.9,
     )
   }
   requestAnimationFrame(frame)
