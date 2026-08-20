@@ -52,9 +52,9 @@ export function initFluidReveal({ onHeartClick } = {}) {
     const hy = H * 0.42 - hh / 2
     lctx.drawImage(heart, hx, hy, hw, hh)
     heartBox = { x: hx, y: hy, w: hw, h: hh }
-    drawChip(lctx, '16 YEARS', W / 2 - hw * 0.52, H * 0.2, false, -0.08)
-    drawChip(lctx, '28.08', W / 2 + hw * 0.5, H * 0.26, false, 0.06)
-    drawChip(lctx, '×K-30', W / 2 + hw * 0.44, H * 0.62, true, -0.05)
+    drawChip(lctx, '16 YEARS', W / 2 - hw * 0.62, H * 0.24, false, -0.08)
+    drawChip(lctx, '28.08', W / 2 + hw * 0.58, H * 0.3, false, 0.06)
+    drawChip(lctx, '×K-30', W / 2 + hw * 0.5, H * 0.66, true, -0.05)
   }
 
   function resize() {
@@ -87,7 +87,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   function frame(t) {
     // fade the trail slowly so the reveal oozes shut
     tctx.globalCompositeOperation = 'destination-out'
-    tctx.fillStyle = 'rgba(0,0,0,0.028)'
+    tctx.fillStyle = 'rgba(0,0,0,0.016)'
     tctx.fillRect(0, 0, trail.width, trail.height)
     tctx.globalCompositeOperation = 'source-over'
 
@@ -105,12 +105,12 @@ export function initFluidReveal({ onHeartClick } = {}) {
       }
       pointer.px = pointer.x
       pointer.py = pointer.y
-    } else if (now - pointer.lastMove > 2600) {
+    } else if (now - pointer.lastMove > 1800) {
       // idle wander so the heart breathes even without a cursor
       idle.t += 0.004
       const ix = trail.width * (0.5 + 0.3 * Math.sin(idle.t * 1.3) * Math.cos(idle.t * 0.7))
       const iy = trail.height * (0.42 + 0.26 * Math.sin(idle.t * 0.9 + 1.7))
-      splat(ix, iy, trail.height * 0.09, 0.16)
+      splat(ix, iy, trail.height * 0.09, 0.24)
     }
 
     // steepen alpha into a torn-edged goo mask
@@ -143,7 +143,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
     const x = (e.clientX - r.left) * DPR
     const y = (e.clientY - r.top) * DPR
     if (x > heartBox.x && x < heartBox.x + heartBox.w && y > heartBox.y && y < heartBox.y + heartBox.h) {
-      onHeartClick()
+      onHeartClick(e.clientX)
     }
   })
 

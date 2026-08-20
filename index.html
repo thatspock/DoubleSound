@@ -26,9 +26,19 @@
   <!-- nav -->
   <nav class="nav">
     <button class="nav-grid-btn" data-grid-toggle aria-label="Toggle grid"></button>
-    <a class="nav-cta p1" data-tickets-link href="https://k-30.com/" target="_blank" rel="noopener">
-      <span class="link-roll" data-roll>tickets</span>
-    </a>
+    <div class="nav-right">
+      <button class="nav-sound" data-sound aria-label="Sound on/off">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path class="snd-body" d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" fill="currentColor" />
+          <path class="snd-wave snd-w1" d="M15 9.2c1.5 1.6 1.5 4 0 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path class="snd-wave snd-w2" d="M17.6 7.2c2.6 2.8 2.6 6.8 0 9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path class="snd-mute" d="M15.2 10.2l4.6 4.6M19.8 10.2l-4.6 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+      <a class="nav-cta p1" data-tickets-link href="https://k-30.com/" target="_blank" rel="noopener">
+        <span class="link-roll" data-roll>tickets</span>
+      </a>
+    </div>
   </nav>
 
   <!-- grid overlay -->
@@ -43,9 +53,9 @@
         <canvas class="fluid-canvas" data-fluid></canvas>
         <img class="heart-static" src="/assets/heart-face.webp" alt="stone heart face" />
       </div>
-      <img class="ika-head" data-ika src="/assets/head-ika.webp" alt="" aria-hidden="true" />
-
       <div class="hero-inner grid">
+        <div class="spine spine-a" aria-hidden="true"></div>
+
         <div class="brand-cell" data-goo>
           <div class="brand-logo" data-heart-spin>
             <svg viewBox="0 0 1069 1154" aria-hidden="true"><path data-heart-path fill="currentColor"></path></svg>
@@ -75,21 +85,18 @@
           <h1 class="offset-r" data-goo>28.08</h1>
         </div>
 
-        <div class="spacer-line sp-1" data-goo></div>
+        <div class="spine spine-b" aria-hidden="true"></div>
 
         <p class="hero-note p1" data-goo>
           Michael Dop &middot; Basic 7 &middot; Preesh &middot; Dvinskikh &middot; Ika<br />
           live at K-30 &middot; doors 23:00 &middot; tickets on kassir.ru
         </p>
 
-        <h1 class="punch-a" data-goo>the best</h1>
-        <h1 class="punch-b" data-goo>nights</h1>
-        <div class="hg punch-c">
-          <h1 data-goo>come</h1>
-          <h1 data-goo>doubled.</h1>
-        </div>
+        <h1 class="p-the" data-goo>the</h1>
+        <h1 class="p-best" data-goo>best</h1>
+        <h1 class="p-mid" data-goo>nights come</h1>
+        <h1 class="p-end" data-goo>doubled.</h1>
 
-        <div class="spacer-line sp-2" data-goo></div>
         <p class="hero-copy p1" data-goo>&copy; '26</p>
       </div>
     </section>
@@ -100,7 +107,7 @@
         <h1 class="lh-a" data-goo>Line</h1>
         <h1 class="lh-b" data-goo>up</h1>
       </div>
-      <div class="artists">
+      <div class="artists grid">
         <div class="artist a-1"><h1 data-goo data-artist>Michael Dop</h1></div>
         <div class="artist a-2"><h1 data-goo data-artist>Basic 7</h1><span class="pill" data-goo>Live</span></div>
         <div class="artist a-3"><h1 data-goo data-artist>Preesh</h1><span class="pill" data-goo>Live</span></div>
@@ -137,11 +144,11 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="grid footer-grid">
-      <div class="hg f-left">
+      <div class="hg f-l1">
         <h1 data-goo>sixteen years</h1>
         <h1 data-goo>of double</h1>
       </div>
-      <div class="hg f-left2">
+      <div class="hg f-l2">
         <h1 data-goo>sound &amp;</h1>
         <h1 data-goo>one night</h1>
       </div>
@@ -159,13 +166,14 @@
         <h1 class="f-par">)</h1>
       </div>
 
-      <div class="hg is-right f-right">
+      <div class="hg f-r1">
         <h1 data-goo>left</h1>
-        <h1 data-goo>to go.</h1>
+        <h1 class="f-indent" data-goo>to go.</h1>
       </div>
-      <div class="hg is-right f-right2">
-        <h1 data-goo>doors 23:00,</h1>
-        <h1 data-goo>28.08</h1>
+
+      <div class="f-meta" data-goo>
+        <p class="p1">doors 23:00 &middot; 28.08</p>
+        <p class="p1 ru dim">Красного Текстильщика, 10-12 АШ</p>
       </div>
 
       <div class="f-badges" data-goo>
@@ -174,9 +182,13 @@
         <span class="badge-pill is-solid">DS<sup>2</sup></span>
       </div>
 
-      <div class="f-address" data-goo>
-        <p class="p1 ru">Красного Текстильщика, 10-12 АШ</p>
-        <p class="p1 dim">&copy; double sound '26 &middot; made w/ &#9829;&#9829;</p>
+      <div class="f-name" data-goo>
+        <h1>double sound<sup>2</sup></h1>
+      </div>
+
+      <div class="f-bottom">
+        <p class="p1 dim">&copy; double sound '26</p>
+        <p class="p1 dim">made w/ &#9829;&#9829;</p>
       </div>
     </div>
   </footer>

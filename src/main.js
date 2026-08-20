@@ -13,6 +13,7 @@ import { initFluidReveal } from './js/fluid.js'
 import { initCountdown } from './js/countdown.js'
 import { dropIka } from './js/easter.js'
 import { bootLog } from './js/boot-log.js'
+import { initAudio } from './js/audio.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -113,9 +114,12 @@ gsap.to('[data-reveal-wrap]', {
 
 // ---------- boot ----------
 bootLog()
+initAudio()
 initCountdown()
 initGooReveals()
 initFluidReveal({ onHeartClick: dropIka })
+// mobile: the static heart drops heads too
+document.querySelector('.heart-static')?.addEventListener('click', (e) => dropIka(e.clientX))
 
 runPreloader().then(() => {
   lenis.start()
