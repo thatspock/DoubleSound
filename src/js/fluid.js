@@ -26,21 +26,6 @@ export function initFluidReveal({ onHeartClick } = {}) {
   const gctx = gray.getContext('2d')
   const content = document.createElement('canvas')
   const cctx = content.getContext('2d')
-  // static noise that eats into the mask edges — jelly-torn rims
-  const noise = document.createElement('canvas')
-  const nctx = noise.getContext('2d')
-
-  function rebuildNoise() {
-    nctx.clearRect(0, 0, noise.width, noise.height)
-    const n = Math.round((noise.width * noise.height) / 900)
-    for (let i = 0; i < n; i++) {
-      const r = 2 + Math.random() * Math.random() * 16
-      nctx.fillStyle = `rgba(255,255,255,${0.35 + Math.random() * 0.65})`
-      nctx.beginPath()
-      nctx.arc(Math.random() * noise.width, Math.random() * noise.height, r, 0, Math.PI * 2)
-      nctx.fill()
-    }
-  }
 
   const TRAIL_SCALE = 0.14
   let W = 0, H = 0
@@ -119,13 +104,24 @@ export function initFluidReveal({ onHeartClick } = {}) {
     trail.height = Math.max(2, Math.round(H * TRAIL_SCALE))
     trailOld.width = trail.width
     trailOld.height = trail.height
-    noise.width = mask.width
-    noise.height = mask.height
-    rebuildNoise()
     paintLayer()
   }
 
   const pointer = { x: -1, y: -1, px: -1, py: -1, lastMove: 0 }
+  let cleanTick = 0
+
+  // 8-bit alpha quantization makes multiplicative fade stall on faint
+  // tails, and the threshold pumps them back up — sweep them to zero
+  function sweepFaintTails() {
+    for (const [cv, cx] of [[trail, tctx], [trailOld, toctx]]) {
+      const id = cx.getImageData(0, 0, cv.width, cv.height)
+      const d = id.data
+      for (let i = 3; i < d.length; i += 4) {
+        if (d[i] > 0 && d[i] < 28) d[i] = Math.max(0, d[i] - 7)
+      }
+      cx.putImageData(id, 0, 0)
+    }
+  }
 
   function splatOn(c, x, y, r, a) {
     const g = c.createRadialGradient(x, y, 0, x, y, r)
@@ -138,7 +134,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   }
   function splat(x, y, r, a) {
     splatOn(tctx, x, y, r, a)
-    splatOn(toctx, x, y, r * 1.35, a) // the ghost spreads wider
+    splatOn(toctx, x, y, r * 1.12, a * 0.8) // the ghost is a touch wider, but faint
   }
 
   function frame(t) {
@@ -148,9 +144,11 @@ export function initFluidReveal({ onHeartClick } = {}) {
     tctx.fillRect(0, 0, trail.width, trail.height)
     tctx.globalCompositeOperation = 'source-over'
     toctx.globalCompositeOperation = 'destination-out'
-    toctx.fillStyle = 'rgba(0,0,0,0.005)'
+    toctx.fillStyle = 'rgba(0,0,0,0.016)'
     toctx.fillRect(0, 0, trailOld.width, trailOld.height)
     toctx.globalCompositeOperation = 'source-over'
+
+    if (++cleanTick % 10 === 0) sweepFaintTails()
 
     const now = performance.now()
     if (pointer.x >= 0 && now - pointer.lastMove < 90) {
@@ -179,27 +177,17 @@ export function initFluidReveal({ onHeartClick } = {}) {
       pointer.py = pointer.y
     }
 
-    // steepen alpha into torn-edged goo masks; noise gnaws the rims
+    // steepen alpha into torn-edged goo masks
     mctx.clearRect(0, 0, mask.width, mask.height)
     mctx.filter = `blur(${mask.height * 0.011}px)`
     mctx.drawImage(trail, 0, 0, mask.width, mask.height)
     mctx.filter = 'none'
-    mctx.globalCompositeOperation = 'destination-out'
-    mctx.globalAlpha = 0.5
-    mctx.drawImage(noise, 0, 0)
-    mctx.globalAlpha = 1
-    mctx.globalCompositeOperation = 'source-over'
     for (let i = 0; i < 5; i++) mctx.drawImage(mask, 0, 0)
 
     moctx.clearRect(0, 0, maskOld.width, maskOld.height)
-    moctx.filter = `blur(${maskOld.height * 0.018}px)`
+    moctx.filter = `blur(${maskOld.height * 0.016}px)`
     moctx.drawImage(trailOld, 0, 0, maskOld.width, maskOld.height)
     moctx.filter = 'none'
-    moctx.globalCompositeOperation = 'destination-out'
-    moctx.globalAlpha = 0.35
-    moctx.drawImage(noise, 0, 0)
-    moctx.globalAlpha = 1
-    moctx.globalCompositeOperation = 'source-over'
     for (let i = 0; i < 3; i++) moctx.drawImage(maskOld, 0, 0)
 
     // cooled ghost: the old mask tinted light grey
@@ -207,7 +195,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
     gctx.clearRect(0, 0, gray.width, gray.height)
     gctx.drawImage(maskOld, 0, 0)
     gctx.globalCompositeOperation = 'source-in'
-    gctx.fillStyle = '#e9e9e9'
+    gctx.fillStyle = '#f0f0f0'
     gctx.fillRect(0, 0, gray.width, gray.height)
 
     paintLayer() // video frame changes every tick
