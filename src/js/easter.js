@@ -63,6 +63,17 @@ export function dropIka(clickX) {
   }
 }
 
+// the ground has a gentle mound in the middle — heads roll off to the sides
+function humpAt(x, W, H) {
+  const u = (x - W / 2) / (W * 0.16)
+  return H * 0.055 * Math.exp(-u * u)
+}
+function humpSlope(x, W, H) {
+  const s = W * 0.16
+  const u = (x - W / 2) / s
+  return H * 0.055 * Math.exp(-u * u) * (-2 * u / s)
+}
+
 function tick(t) {
   const dt = Math.min((t - lastT) / 1000, 0.032)
   lastT = t
@@ -76,11 +87,12 @@ function tick(t) {
     h.a += h.va * dt
 
     if (!h.phantom) {
-      const floor = H - h.hh
+      const floor = H - humpAt(h.x, W, H) - h.hh
       if (h.y > floor) {
         h.y = floor
         if (Math.abs(h.vy) > 60) h.vy = -h.vy * REST_FLOOR
         else h.vy = 0
+        h.vx += -G * 2 * humpSlope(h.x, W, H) * dt  // roll downhill, away from the mound
         h.vx *= 0.985                  // rolling friction
         h.va = h.vx / h.r              // roll, don't slide
       }
