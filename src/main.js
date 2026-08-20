@@ -1,0 +1,123 @@
+import '@fontsource-variable/inter-tight'
+import '@fontsource-variable/inter-tight/wght-italic.css'
+import './styles/main.css'
+
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Lenis from 'lenis'
+
+import { HEART_D } from './js/heart-path.js'
+import { initGooReveals } from './js/goo.js'
+import { runPreloader } from './js/preloader.js'
+import { initFluidReveal } from './js/fluid.js'
+import { initCountdown } from './js/countdown.js'
+import { dropIka } from './js/easter.js'
+import { bootLog } from './js/boot-log.js'
+
+gsap.registerPlugin(ScrollTrigger)
+
+// ---------- smooth scroll ----------
+const lenis = new Lenis({ lerp: 0.11 })
+lenis.on('scroll', ScrollTrigger.update)
+gsap.ticker.add((t) => lenis.raf(t * 1000))
+gsap.ticker.lagSmoothing(0)
+lenis.stop()
+
+// ---------- heart silhouettes ----------
+document.querySelectorAll('[data-heart-path]').forEach((p) => p.setAttribute('d', HEART_D))
+
+// spin totems on click
+document.querySelectorAll('[data-heart-spin]').forEach((el) => {
+  let turns = 0
+  el.addEventListener('click', () => {
+    turns += 1
+    gsap.to(el, { rotation: turns * 360, duration: 1.4, ease: 'elastic.out(1, 0.6)' })
+  })
+})
+
+// ---------- grid overlay toggle ----------
+const gridBtn = document.querySelector('[data-grid-toggle]')
+const gridOverlay = document.querySelector('[data-grid-overlay]')
+gridBtn?.addEventListener('click', () => gridOverlay.classList.toggle('is-on'))
+
+// ---------- nav link char-roll ----------
+document.querySelectorAll('[data-roll]').forEach((el) => {
+  const text = el.textContent
+  el.textContent = ''
+  el.style.cssText += 'display:inline-block;position:relative;overflow:clip'
+  const mk = (cls, y) => {
+    const row = document.createElement('span')
+    row.style.cssText = cls
+    for (const ch of text) {
+      const c = document.createElement('span')
+      c.textContent = ch
+      c.style.cssText = 'display:inline-block'
+      if (y) c.style.transform = 'translateY(100%)'
+      row.appendChild(c)
+    }
+    el.appendChild(row)
+    return [...row.children]
+  }
+  const label = mk('display:inline-block', false)
+  const shadow = mk('display:inline-block;position:absolute;left:0;top:0', true)
+  const parent = el.closest('a') || el
+  parent.addEventListener('mouseenter', () => {
+    gsap.to(label, { yPercent: -100, duration: 0.4, ease: 'power3.inOut', stagger: 0.02 })
+    gsap.to(shadow, { yPercent: -100, duration: 0.4, ease: 'power3.inOut', stagger: 0.02 })
+  })
+  parent.addEventListener('mouseleave', () => {
+    gsap.to(label, { yPercent: 0, duration: 0.4, ease: 'power3.inOut', stagger: 0.02 })
+    gsap.to(shadow, { yPercent: 0, duration: 0.4, ease: 'power3.inOut', stagger: 0.02 })
+  })
+})
+
+// ---------- artist rows: drift on hover ----------
+document.querySelectorAll('[data-artist]').forEach((el) => {
+  el.addEventListener('mouseenter', () => gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' }))
+  el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
+})
+
+// ---------- sticky bottom name ----------
+const stickyName = document.querySelector('[data-sticky-name]')
+if (stickyName) {
+  gsap.to(stickyName, {
+    opacity: 1,
+    scrollTrigger: { trigger: '.lineup', start: 'top 80%', end: 'top 30%', scrub: true },
+  })
+  gsap.to('[data-sn-left]', {
+    x: () => window.innerWidth * 0.28,
+    scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true },
+  })
+  gsap.to('[data-sn-right]', {
+    x: () => -window.innerWidth * 0.28,
+    scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true },
+  })
+}
+
+// ---------- custom scrollbar ----------
+const thumb = document.querySelector('[data-scrollbar-thumb]')
+if (thumb) {
+  lenis.on('scroll', ({ progress }) => {
+    const track = window.innerHeight - thumb.offsetHeight - 8
+    thumb.style.transform = `translateY(${progress * track}px)`
+  })
+}
+
+// ---------- hero parallax: reveal layer drifts out ----------
+gsap.to('[data-reveal-wrap]', {
+  yPercent: 18,
+  opacity: 0.25,
+  ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'center center', end: 'bottom top', scrub: true },
+})
+
+// ---------- boot ----------
+bootLog()
+initCountdown()
+initGooReveals()
+initFluidReveal({ onHeartClick: dropIka })
+
+runPreloader().then(() => {
+  lenis.start()
+  ScrollTrigger.refresh()
+})
