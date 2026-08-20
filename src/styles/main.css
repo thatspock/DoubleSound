@@ -143,7 +143,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   padding: calc(5rem / var(--sr)) calc(10rem / var(--sr));
   transition: background var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 }
-.nav-cta:hover { background: var(--green); color: var(--white); }
+@media (hover: hover) { .nav-cta:hover { background: var(--green); color: var(--white); } }
 
 .nav-sound {
   pointer-events: auto;
@@ -157,7 +157,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   cursor: pointer;
   transition: background var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 }
-.nav-sound:hover { background: var(--green); color: var(--white); }
+@media (hover: hover) { .nav-sound:hover { background: var(--green); color: var(--white); } }
 .nav-sound svg { width: calc(16rem / var(--sr)); height: calc(16rem / var(--sr)); }
 .nav-sound .snd-wave { display: none; }
 .nav-sound.is-on .snd-wave { display: block; }
@@ -210,7 +210,6 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 .brand-cell {
   grid-area: 1 / 3 / 2 / 4;
-  min-height: calc(210rem / var(--sr));
   /* white + difference: reads black on the white page, flips to white
      wherever the dark reveal passes underneath — per-pixel, no triggers */
   color: var(--white);
@@ -229,9 +228,11 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 .hg { display: flex; flex-direction: column; align-items: flex-start; }
 
-.hg-name { grid-area: 2 / 4 / 3 / 8; margin-top: 30vh; padding-left: var(--line-gap); }
-.hg-years { grid-area: 3 / 3 / 4 / 7; margin-top: calc(56rem / var(--sr)); }
-.hg-date { grid-area: 4 / 4 / 5 / 8; margin-top: calc(20rem / var(--sr)); padding-left: var(--line-gap); }
+/* the whole message — name, sixteen years ×K-30, one night 28.08 —
+   must finish inside the first viewport; the fluid stage lives beneath it */
+.hg-name { grid-area: 2 / 4 / 3 / 8; margin-top: calc(36rem / var(--sr)); padding-left: var(--line-gap); }
+.hg-years { grid-area: 3 / 3 / 4 / 7; margin-top: calc(28rem / var(--sr)); }
+.hg-date { grid-area: 4 / 4 / 5 / 8; margin-top: calc(14rem / var(--sr)); padding-left: var(--line-gap); }
 .hg-date .offset-r { padding-left: calc(120rem / var(--sr)); }
 
 .hero-note {
@@ -269,7 +270,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   cursor: default;
   transition: color var(--dur-s) var(--ease-out);
 }
-.artist h1:hover { color: var(--green); }
+@media (hover: hover) { .artist h1:hover { color: var(--green); } }
 .a-1 { grid-column: 2 / 8; }
 .a-2 { grid-column: 3 / 9; }
 .a-3 { grid-column: 5 / 9; }
@@ -341,7 +342,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   color: var(--ink);
   transition: color var(--dur-s) var(--ease-out);
 }
-.tickets-link:hover h1 { color: var(--green); }
+/* hover-only: on touch a tap would leave the word stuck green */
+@media (hover: hover) { .tickets-link:hover h1 { color: var(--green); } }
 .tickets-note { color: var(--ink-strong); }
 
 /* ---------------- footer ---------------- */
@@ -411,7 +413,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   font-weight: 560;
   transition: background var(--dur-s) var(--ease-out), color var(--dur-s) var(--ease-out);
 }
-a.badge-pill:hover { background: var(--black); color: var(--green); border-color: var(--black); }
+@media (hover: hover) { a.badge-pill:hover { background: var(--black); color: var(--green); border-color: var(--black); } }
 .badge-pill.is-solid { background: var(--black); color: var(--green); border-color: var(--black); }
 
 /* closing row: giant wordmark cropped by the page edge, meta in the corners */
@@ -503,7 +505,8 @@ a.badge-pill:hover { background: var(--black); color: var(--green); border-color
   .spine { display: none; }
   .brand-cell { grid-area: 1 / 1 / 2 / 3; }
   .hero-meta { grid-area: 1 / 3 / 2 / 7; padding-right: calc(64rem / var(--sr)); }
-  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 52vh; }
+  /* start right below the floating heart so the full message fits the fold */
+  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 34vh; }
   .hg-years { grid-area: 3 / 1 / 4 / 7; }
   .hg-date { grid-area: 4 / 1 / 5 / 7; }
   .hero-note { grid-area: 5 / 1 / 6 / 7; margin-top: calc(40rem / var(--sr)); }
