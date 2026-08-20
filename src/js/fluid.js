@@ -108,12 +108,6 @@ export function initFluidReveal({ onHeartClick } = {}) {
   }
 
   const pointer = { x: -1, y: -1, px: -1, py: -1, lastMove: 0 }
-  // autonomous wanderers: the reveal lives and churns on its own,
-  // the mouse just tears it open wider
-  const drifters = [
-    { t: Math.random() * 100, fx: 1.3, fy: 0.9, ph: 1.7, r: 0.13 },
-    { t: Math.random() * 100, fx: 0.7, fy: 1.1, ph: 4.2, r: 0.1 },
-  ]
 
   function splatOn(c, x, y, r, a) {
     const g = c.createRadialGradient(x, y, 0, x, y, r)
@@ -139,14 +133,6 @@ export function initFluidReveal({ onHeartClick } = {}) {
     toctx.fillStyle = 'rgba(0,0,0,0.005)'
     toctx.fillRect(0, 0, trailOld.width, trailOld.height)
     toctx.globalCompositeOperation = 'source-over'
-
-    // wanderers churn all the time, mouse or not
-    for (const d of drifters) {
-      d.t += 0.0045
-      const ix = trail.width * (0.5 + 0.34 * Math.sin(d.t * d.fx) * Math.cos(d.t * 0.63 + d.ph))
-      const iy = trail.height * (0.42 + 0.3 * Math.sin(d.t * d.fy + d.ph))
-      splat(ix, iy, trail.height * d.r, 0.5)
-    }
 
     const now = performance.now()
     if (pointer.x >= 0 && now - pointer.lastMove < 90) {
@@ -224,14 +210,5 @@ export function initFluidReveal({ onHeartClick } = {}) {
   window.addEventListener('resize', resize)
   resize()
 
-  // welcome burst: the heart arrives mostly revealed
-  for (let i = 0; i < 26; i++) {
-    splat(
-      trail.width * (0.5 + (Math.random() - 0.5) * 0.42),
-      trail.height * (0.42 + (Math.random() - 0.5) * 0.4),
-      trail.height * (0.1 + Math.random() * 0.14),
-      0.9,
-    )
-  }
   requestAnimationFrame(frame)
 }
