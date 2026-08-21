@@ -2,7 +2,8 @@
 // tracking code, and the tag waits for window load so it never competes
 // with fonts, the hero image or the video for bandwidth.
 export function initAnalytics() {
-  const id = import.meta.env.VITE_GA_ID
+  // dev builds stay silent; VITE_GA_ID can override the baked-in id
+  const id = import.meta.env.VITE_GA_ID || (import.meta.env.PROD ? 'G-NC9TDZ3SJZ' : '')
   if (!id) return
   const load = () => {
     const s = document.createElement('script')

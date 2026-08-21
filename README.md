@@ -26,7 +26,7 @@ npm run dev
 
 `npm run build` outputs to `dist/`. Deployed on Vercel, pushes to `main` go live.
 
-Analytics is opt-in: set `VITE_GA_ID` to a GA4 measurement id at build time and the tag loads after `window.load`. Without the id no tracking code ships at all.
+Analytics: production builds load GA4 after `window.load` so it never competes with the site itself. Dev builds ship no tracking code at all, and `VITE_GA_ID` overrides the measurement id at build time.
 
 ## Performance
 
