@@ -678,7 +678,9 @@ sup { font-size: 0.55em; vertical-align: super; }
   }
   .sp-s1::after { content: none; }
   .sp-s2 {
-    grid-area: 4 / 1 / 5 / 3;
+    /* one continuous run: past "one night", along the lineup note (which
+       sits right of the axis), down to the punch */
+    grid-area: 4 / 1 / 6 / 3;
     justify-self: start;
     margin: 0 0 0 calc(64rem / var(--sr) + var(--pad));
   }
@@ -689,7 +691,8 @@ sup { font-size: 0.55em; vertical-align: super; }
     display: block;
     grid-area: 6 / 1 / 7 / 3;
     justify-self: start;
-    margin: var(--line-gap) 0 0 calc(64rem / var(--sr) + var(--pad));
+    /* negative top margin bridges the grid row-gap — no visible seam */
+    margin: calc((var(--gap) + 1px) * -1) 0 0 calc(64rem / var(--sr) + var(--pad));
   }
   /* lower segments share the same logo-inset axis as the hero rule */
   .sp-s3 { grid-area: 9 / 1 / 10 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
