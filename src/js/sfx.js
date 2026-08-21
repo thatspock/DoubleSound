@@ -109,18 +109,86 @@ const VOICES = {
     n.start(t); n.stop(t + 0.05)
   },
   pluck(t) {
-    // acid pluck walking the A-minor pentatonic — the "guitar"
+    // the "guitar": a physically-modelled string (Karplus–Strong) walking
+    // the pentatonic, warm-filtered, with a crystal bell cap and a quiet
+    // dub-delay tail — deep, hypnotic, california
     const notes = [220, 261.63, 329.63, 392, 440]
-    const o = ctx.createOscillator()
-    o.type = 'sawtooth'
-    o.frequency.value = notes[Math.floor(Math.random() * notes.length)]
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 13
-    lp.frequency.setValueAtTime(2400, t)
-    lp.frequency.exponentialRampToValueAtTime(280, t + 0.16)
-    const g = env(t, 0.42, 0.2)
-    o.connect(lp).connect(g).connect(master)
-    o.start(t); o.stop(t + 0.22)
+    const f = notes[Math.floor(Math.random() * notes.length)]
+    const out = ctx.createGain()
+    out.gain.setValueAtTime(0.34, t)
+    out.gain.setTargetAtTime(0, t + 0.9, 0.35)
+    const lp = ctx.createBiquadFilter()
+    lp.type = 'lowpass'
+    lp.frequency.value = 3200
+    // two strings a hair apart — the silk
+    for (const det of [1, 1.004]) {
+      const src = ctx.createBufferSource()
+      src.buffer = pluckString(f * det)
+      src.connect(lp)
+      src.start(t)
+      src.stop(t + 1.6)
+    }
+    lp.connect(out)
+    out.connect(master)
+    out.connect(ensurePluckEcho())
+    // crystal cap: a tiny bell one octave up
+    const bell = ctx.createOscillator()
+    bell.type = 'sine'
+    bell.frequency.value = f * 2
+    const bg = env(t, 0.07, 0.5)
+    bell.connect(bg)
+    bg.connect(master)
+    bell.start(t)
+    bell.stop(t + 0.55)
   },
+}
+
+// Karplus–Strong: a noise burst circulating in a ring buffer with
+// averaging — decays like a real plucked string
+function pluckString(freq) {
+  const sr = ctx.sampleRate
+  const dur = 1.5
+  const buf = ctx.createBuffer(1, Math.ceil(sr * dur), sr)
+  const d = buf.getChannelData(0)
+  const N = Math.max(2, Math.round(sr / freq))
+  const ring = new Float32Array(N)
+  for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1
+  let idx = 0
+  for (let i = 0; i < d.length; i++) {
+    const cur = ring[idx]
+    const nxt = ring[(idx + 1) % N]
+    d[i] = cur
+    ring[idx] = 0.996 * 0.5 * (cur + nxt)
+    idx = (idx + 1) % N
+  }
+  return buf
+}
+
+// hypnotic tail: one shared feedback delay, band-filtered so the echoes
+// get rounder and deeper with every repeat
+let pluckEcho = null
+function ensurePluckEcho() {
+  if (pluckEcho) return pluckEcho
+  const send = ctx.createGain()
+  send.gain.value = 0.18
+  const dly = ctx.createDelay(1)
+  dly.delayTime.value = 0.28
+  const fb = ctx.createGain()
+  fb.gain.value = 0.4
+  const bp = ctx.createBiquadFilter()
+  bp.type = 'bandpass'
+  bp.frequency.value = 1200
+  bp.Q.value = 1.1
+  const wet = ctx.createGain()
+  wet.gain.value = 0.5
+  send.connect(dly)
+  dly.connect(bp)
+  bp.connect(fb)
+  fb.connect(dly)
+  bp.connect(wet)
+  wet.connect(master)
+  pluckEcho = send
+  return send
 }
 
 // barely-there wind for the empty air between the names: movement swells
