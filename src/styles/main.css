@@ -796,7 +796,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   /* same anchor as phones: text sits a line-gap right of the spine */
   .hero-meta { grid-area: 1 / 1 / 2 / 7; padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); padding-right: calc(90rem / var(--sr)); margin-top: 0; gap: calc(4rem / var(--sr)); }
   /* closing manifest: full-size type overran the viewport top on minis */
-  .f-l1 h1, .f-l2 h1 { font-size: calc(64rem / var(--sr)); }
+  .f-l1 h1, .f-l2 h1 { font-size: calc(38rem / var(--sr)); }
+  .footer-grid { grid-row-gap: calc(8rem / var(--sr)); }
   .hero-meta .p1 { font-size: calc(9.5rem / var(--sr)); }
 }
 /* tall-but-short tablets (iPad mini portrait): the same stack is a touch

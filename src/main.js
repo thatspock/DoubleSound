@@ -162,23 +162,57 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
 // barely-there wind that fades away on its own.
 const ARTIST_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
 const TOUCH_UI = window.matchMedia('(hover: none)').matches
+// scrolling must stay silent: rows sliding under a parked cursor fire
+// mouseenter, and a touch-scroll starts with pointerdown — neither is
+// the user "playing" the instrument
+let lastMouseMove = 0
+window.addEventListener('mousemove', () => { lastMouseMove = performance.now() })
+let lastScrollTs = 0
+lenis.on('scroll', () => { lastScrollTs = performance.now() })
+const isTap = (t0, e) =>
+  t0 && performance.now() - t0.ts < 350 &&
+  Math.hypot(e.clientX - t0.x, e.clientY - t0.y) < 12
+const strike = (el, voice) => {
+  hit(voice)
+  el.classList.add('is-struck')
+  clearTimeout(el._struckT)
+  el._struckT = setTimeout(() => el.classList.remove('is-struck'), 450)
+  gsap.timeline()
+    .to(el, { x: '1.2vw', duration: 0.16, ease: 'power3.out' })
+    .to(el, { x: 0, duration: 0.5, ease: 'power3.out' })
+}
+// chords: every finger is its own pointer, so two or three rows can be
+// struck at once. One finger stays a tap (scroll must survive); the
+// moment a second finger lands, all held rows sound together.
+const activeTouches = new Map()
 document.querySelectorAll('[data-artist]').forEach((el, i) => {
   const voice = ARTIST_VOICES[i % ARTIST_VOICES.length]
   if (TOUCH_UI) {
-    // one handler only — iOS synthesizes mouseenter on tap, which
-    // double-fired the strike and left the row stuck mid-drift
-    el.addEventListener('pointerdown', () => {
-      hit(voice)
-      el.classList.add('is-struck')
-      clearTimeout(el._struckT)
-      el._struckT = setTimeout(() => el.classList.remove('is-struck'), 450)
-      gsap.timeline()
-        .to(el, { x: '1.2vw', duration: 0.16, ease: 'power3.out' })
-        .to(el, { x: 0, duration: 0.5, ease: 'power3.out' })
+    el.addEventListener('pointerdown', (e) => {
+      el._t0 = { x: e.clientX, y: e.clientY, ts: performance.now() }
+      activeTouches.set(e.pointerId, { el, voice, played: false })
+      if (activeTouches.size >= 2) {
+        for (const t of activeTouches.values()) {
+          if (!t.played) { t.played = true; strike(t.el, t.voice) }
+        }
+      }
     })
+    el.addEventListener('pointerup', (e) => {
+      const t = activeTouches.get(e.pointerId)
+      activeTouches.delete(e.pointerId)
+      const t0 = el._t0
+      el._t0 = null
+      if (t?.played) return // already sounded as part of a chord
+      if (!isTap(t0, e)) return
+      strike(el, voice)
+    })
+    el.addEventListener('pointercancel', (e) => activeTouches.delete(e.pointerId))
     return
   }
   el.addEventListener('mouseenter', () => {
+    // a wheel-scroll drives rows under a still cursor — only a moving
+    // mouse counts as playing
+    if (performance.now() - lastMouseMove > 200) return
     hit(voice)
     gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' })
   })
@@ -191,13 +225,25 @@ const WIND_TONES = [440, 523.25, 659.25, 783.99, 880]
 const artistsWrap = document.querySelector('.artists')
 const artistRows = [...document.querySelectorAll('.artist')]
 const windIfEmpty = (e) => {
+  if (performance.now() - lastScrollTs < 150) return // mid-scroll = silence
   if (e.target.closest('[data-artist]')) return
   let i = artistRows.length - 1
   while (i >= 0 && e.clientY < artistRows[i].getBoundingClientRect().top) i--
   windTouch(i >= 0 ? WIND_TONES[i % WIND_TONES.length] : WIND_TONES[0])
 }
 artistsWrap?.addEventListener('pointermove', windIfEmpty)
-artistsWrap?.addEventListener('pointerdown', windIfEmpty)
+if (TOUCH_UI) {
+  // two fingers in the lineup = playing, not scrolling
+  artistsWrap?.addEventListener('touchstart', (e) => {
+    if (e.touches.length >= 2) e.preventDefault()
+  }, { passive: false })
+  // wind on a clean tap only — a touch-scroll also starts with pointerdown
+  let wt0 = null
+  artistsWrap?.addEventListener('pointerdown', (e) => { wt0 = { x: e.clientX, y: e.clientY, ts: performance.now() } })
+  artistsWrap?.addEventListener('pointerup', (e) => { if (isTap(wt0, e)) windIfEmpty(e); wt0 = null })
+} else {
+  artistsWrap?.addEventListener('pointerdown', windIfEmpty)
+}
 
 // ---------- sticky bottom name ----------
 const stickyName = document.querySelector('[data-sticky-name]')
