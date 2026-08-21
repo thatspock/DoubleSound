@@ -122,7 +122,8 @@ sup { font-size: 0.55em; vertical-align: super; }
 /* ---------------- nav ---------------- */
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 90;
-  display: flex; justify-content: space-between; align-items: center;
+  /* grid square is parked — lone pill group pins right; back to space-between when it returns */
+  display: flex; justify-content: flex-end; align-items: center;
   padding: var(--pad);
   pointer-events: none;
 }
