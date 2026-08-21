@@ -186,7 +186,14 @@ sup { font-size: 0.55em; vertical-align: super; }
 .grid-overlay div { background: rgba(0, 0, 0, 0.05); }
 
 /* ---------------- hero ---------------- */
-.hero { position: relative; }
+.hero {
+  position: relative;
+  /* own background + stacking context: difference type blends against
+     THIS paint (the html canvas is not a blending backdrop), while the
+     mobile rule (z:-1) still slots above it and below the heart image */
+  z-index: 0;
+  background: var(--bg);
+}
 
 .reveal-wrap {
   position: absolute; inset: 0 0 auto 0;
