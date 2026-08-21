@@ -39,6 +39,8 @@ function ensure() {
 const SILENT_WAV = '/assets/silence.wav' // real file: iOS won't reliably play data: URIs
 const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']
 let keepAlive = null
+let bridge = null // touch devices: route synth through an <audio> element,
+                  // the channel the ringer switch does NOT mute
 let pending = null // the strike that arrived while the context was waking
 
 export function initSfx() {
@@ -58,6 +60,21 @@ export function initSfx() {
       if (ctx.state !== 'running') return
       UNLOCK_EVENTS.forEach((e) => document.removeEventListener(e, unlock, true))
       console.log('%c[sfx] audio unlocked — the lineup is live', 'color:#609957')
+      // touch: pipe the master bus into an HTMLAudio element — media
+      // playback ignores the silent switch, unlike raw Web Audio
+      if (!bridge && window.matchMedia('(hover: none)').matches && ctx.createMediaStreamDestination) {
+        try {
+          const msd = ctx.createMediaStreamDestination()
+          const out = new Audio()
+          out.srcObject = msd.stream
+          out.play().then(() => {
+            master.disconnect()
+            master.connect(msd)
+            bridge = out
+            debugLine('bridge ON (media route)')
+          }).catch((e) => debugLine('bridge failed: ' + e?.message))
+        } catch (e) { debugLine('bridge error: ' + e?.message) }
+      }
       // warmup: a near-silent blip validates the whole graph on iOS
       const o = ctx.createOscillator()
       const g = ctx.createGain()
