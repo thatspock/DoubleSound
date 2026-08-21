@@ -275,7 +275,10 @@ sup { font-size: 0.55em; vertical-align: super; }
 .hg-date { grid-area: 4 / 4 / 5 / 8; margin-top: calc(14rem / var(--sr)); padding-left: var(--line-gap); }
 /* the 'g' descender of "night" must clear "28.08" on the next line */
 .hg-date h1 { line-height: 0.98; }
-.hg-date .offset-r { padding-left: calc(120rem / var(--sr)); }
+/* the block shrink-wraps to "one night –", so flex-end lands the last
+   eight of 28.08 exactly under the dash tip */
+.hg-date { width: fit-content; align-items: flex-end; }
+.hg-date h1:first-child { align-self: flex-start; }
 
 /* the lineup note is a chat bubble: typing dots first, then the names
    arrive in chunks (each striking its drum voice). Opaque — readable
