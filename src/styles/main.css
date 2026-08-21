@@ -262,13 +262,10 @@ sup { font-size: 0.55em; vertical-align: super; }
   color: #d1d1cd;
   mix-blend-mode: difference;
 }
-.hero-meta, .hero-note {
+.hero-meta {
   color: #d1d1cd;
   mix-blend-mode: difference;
 }
-/* the small lineup note reads softer: #b0b0ad differenced against the
-   paper = #40403e */
-.hero-note { color: #b0b0ad; }
 
 /* the whole message — name, sixteen years ×K-30, one night 28.08 —
    must finish inside the first viewport; the fluid stage lives beneath it */
@@ -277,12 +274,17 @@ sup { font-size: 0.55em; vertical-align: super; }
 .hg-date { grid-area: 4 / 4 / 5 / 8; margin-top: calc(14rem / var(--sr)); padding-left: var(--line-gap); }
 .hg-date .offset-r { padding-left: calc(120rem / var(--sr)); }
 
+/* the lineup note is a soft capsule, reference-style — opaque, so it
+   stays readable over the dark reveal without any blending */
 .hero-note {
   grid-area: 5 / 4 / 6 / 7;
   margin-top: calc(56rem / var(--sr));
-  /* colour lives in the difference block above: #b0b0ad -> #40403e on
-     paper. ink-strong here turned the blend pale — don't put it back */
-  padding-left: var(--line-gap);
+  margin-left: var(--line-gap);
+  justify-self: start;
+  background: #e5e4df;
+  color: #40403e;
+  border-radius: calc(40rem / var(--sr));
+  padding: calc(10rem / var(--sr)) calc(18rem / var(--sr));
 }
 
 /* punch phrase, staggered like the reference's "the best ideas deserve execution." */
@@ -585,7 +587,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .brand-cell { grid-area: 1 / 1 / 2 / 3; }
   .hero-meta { grid-area: 1 / 3 / 2 / 7; padding-right: calc(64rem / var(--sr)); }
   /* start right below the floating heart so the full message fits the fold */
-  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 40vh; }
+  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 36svh; }
   .hg-years { margin-top: calc(18rem / var(--sr)); }
   .hg-date { margin-top: calc(10rem / var(--sr)); }
   .hg-years { grid-area: 3 / 1 / 4 / 7; }
@@ -625,11 +627,10 @@ sup { font-size: 0.55em; vertical-align: super; }
     color: var(--ink);
     mix-blend-mode: normal;
   }
-  .hero-meta, .hero-note {
+  .hero-meta {
     color: var(--ink-strong);
     mix-blend-mode: normal;
   }
-  .hero-note { color: #40403e; }
   .brand-cell { color: var(--ink-strong); mix-blend-mode: normal; }
 
   /* let the wordmark sit on a deliberate pause above the iOS home bar,
@@ -691,7 +692,8 @@ sup { font-size: 0.55em; vertical-align: super; }
     justify-self: start;
     margin: 0 0 0 calc(64rem / var(--sr) + var(--pad));
   }
-  .hg-name, .hg-date, .hero-note { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
+  .hg-name, .hg-date { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
+  .hero-note { margin-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
   /* from under the lineup note down into the gap between "the" and
      "best", ending level with the bottoms of their letters */
   .sp-s5 {
