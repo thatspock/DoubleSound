@@ -72,25 +72,25 @@ document.querySelectorAll('[data-egg]').forEach((el) => {
 })
 
 // ---------- hero note types itself in like a chat message ----------
-// iMessage pattern: typing dots, then the message lands in CHUNKS (per
-// name, never per letter), each name striking its drum-machine voice
+// iMessage pattern: typing dots, then the lineup flows in word by word —
+// smooth, silent, and the bubble never changes size (a hidden ghost of
+// the final text reserves it). Loops while on screen.
 const chatNote = document.querySelector('[data-chat]')
 if (chatNote) {
-  // NBSPs pin each '·' to the name before it — lines may break only
-  // after a separator, never before it and never inside a name
-  const NAMES = ['Michael\u00A0Dop', '\u00A0\u00B7 Basic\u00A07', '\u00A0\u00B7 Preesh', '\u00A0\u00B7 Dvinskikh', '\u00A0\u00B7 Ika']
-  const CHAT_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
+  const mob = window.matchMedia('(max-width: 991px)').matches
+  const TXT = mob
+    ? 'Michael\u00A0Dop \u00B7 Basic\u00A07 \u00B7 Preesh \u00B7\nDvinskikh \u00B7 Ika'
+    : 'Michael\u00A0Dop \u00B7 Basic\u00A07 \u00B7 Preesh \u00B7 Dvinskikh \u00B7 Ika'
+  const TOKENS = TXT.match(/\S+\s*/g)
   const l1 = chatNote.querySelector('.hn-1')
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const finish = () => {
-    l1.textContent = NAMES.join('')
+    l1.textContent = TXT
     chatNote.classList.remove('is-typing')
     chatNote.classList.add('is-in', 'is-done')
   }
   if (reduced) finish()
   else {
-    // the chat lives: types in, rests, then retypes — but only while
-    // it's actually on screen; off-screen it freezes fully typed
     let alive = false
     let idle = true
     const cycle = () => {
@@ -104,15 +104,14 @@ if (chatNote) {
         chatNote.classList.remove('is-typing')
         let i = 0
         const step = () => {
-          if (i >= NAMES.length) {
-            setTimeout(() => chatNote.classList.add('is-done'), 220)
+          if (i >= TOKENS.length) {
+            setTimeout(() => chatNote.classList.add('is-done'), 200)
             setTimeout(cycle, 7000)
             return
           }
-          l1.textContent += NAMES[i]
-          hit(CHAT_VOICES[i])
+          l1.textContent += TOKENS[i]
           i += 1
-          setTimeout(step, 170)
+          setTimeout(step, 90)
         }
         step()
       }, 900)
