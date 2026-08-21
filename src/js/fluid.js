@@ -100,6 +100,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
 
   const pointer = { x: -1, y: -1, px: -1, py: -1, lastMove: 0 }
   let cleanTick = 0
+  const nav = document.querySelector('.nav')
 
   // canvas SVG-filter support (Safari lacks it — fall back to alpha stacking)
   mctx.filter = 'url(#fluid-step)'
@@ -192,6 +193,18 @@ export function initFluidReveal({ onHeartClick } = {}) {
     cctx.globalCompositeOperation = 'destination-in'
     cctx.drawImage(mask, 0, 0, W, H)
     cctx.globalCompositeOperation = 'source-over'
+
+    // nav pills flip to the light theme only when the revealed VIDEO
+    // under them is actually dark — the mask alone can be light stone
+    if (nav && cleanTick % 6 === 0 && window.scrollY < H / DPR) {
+      const y = Math.round(27 * DPR)
+      const dark = (x) => {
+        const p = cctx.getImageData(x, y, 1, 1).data
+        return p[3] > 128 && (p[0] + p[1] + p[2]) / 3 < 70
+      }
+      nav.classList.toggle('is-inverted',
+        dark(Math.max(0, W - Math.round(45 * DPR))) || dark(Math.max(0, W - Math.round(100 * DPR))))
+    }
 
     ctx.clearRect(0, 0, W, H)
     ctx.drawImage(content, 0, 0)

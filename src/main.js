@@ -19,6 +19,10 @@ import { hit, initSfx, windTouch } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// a refresh always opens at the top — the preloader intro assumes it
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+window.scrollTo(0, 0)
+
 // ---------- smooth scroll ----------
 const lenis = new Lenis({ lerp: 0.11 })
 lenis.on('scroll', ScrollTrigger.update)

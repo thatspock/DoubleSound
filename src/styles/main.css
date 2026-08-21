@@ -145,6 +145,10 @@ sup { font-size: 0.55em; vertical-align: super; }
 }
 @media (hover: hover) { .nav-cta:hover { background: var(--green); color: var(--white); } }
 
+/* the dark reveal has swallowed the pills' corner — flip to light */
+.nav.is-inverted .nav-cta,
+.nav.is-inverted .nav-sound { background: #e0e0e1; color: var(--green-2); }
+
 .nav-sound {
   pointer-events: auto;
   display: flex; align-items: center; justify-content: center;
@@ -214,7 +218,9 @@ sup { font-size: 0.55em; vertical-align: super; }
 .sp-s3::after {
   content: '';
   position: absolute;
-  top: calc(100% - 1px); right: 0;
+  /* the parent's rule is its border, which lives OUTSIDE the padding box —
+     anchor the tail under that border or the joint kinks sideways */
+  top: calc(100% - 1px); right: calc(var(--stroke) * -1);
   height: calc(128rem / var(--sr));
   border-right: var(--stroke) solid var(--ink-strong);
 }
@@ -580,7 +586,7 @@ sup { font-size: 0.55em; vertical-align: super; }
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: auto auto 1fr auto auto auto;
   }
-  .f-count { margin: calc(76rem / var(--sr)) 0 0; } /* clear the fixed nav pills */
+  .f-count { margin: calc(20rem / var(--sr)) 0 0; }
   .f-count-label { grid-area: 2 / 1 / 3 / 7; margin: calc(16rem / var(--sr)) 0 calc(20rem / var(--sr)); }
   /* no fluid reveal on mobile — difference-blended white type would just
      vanish on the white page (Safari), so plain ink here */
@@ -619,7 +625,13 @@ sup { font-size: 0.55em; vertical-align: super; }
   .facts { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
   .facts-head { margin-bottom: calc(44rem / var(--sr)); }
   .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
-  .footer-grid { padding-top: calc(32rem / var(--sr)); }
+  /* the entire footer — manifest, timer, wordmark — is one phone screen */
+  .footer-grid {
+    padding-top: calc(32rem / var(--sr));
+    min-height: calc(100svh - calc(40rem / var(--sr)) - var(--footer-pad-b));
+    grid-template-rows: auto auto 1fr;
+  }
+  .f-closing { min-height: 0; }
   .f-badges { margin-top: calc(28rem / var(--sr)); }
   .f-final { margin-top: calc(28rem / var(--sr)); }
   /* -8rem tracking is fine at 210rem, but at phone scale it collapses
