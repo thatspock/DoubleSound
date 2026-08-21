@@ -695,7 +695,14 @@ sup { font-size: 0.55em; vertical-align: super; }
     margin: calc((var(--gap) + 1px) * -1) 0 0 calc(64rem / var(--sr) + var(--pad));
   }
   /* lower segments share the same logo-inset axis as the hero rule */
-  .sp-s3 { grid-area: 9 / 1 / 10 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
+  .sp-s3 {
+    grid-area: 9 / 1 / 10 / 3;
+    justify-self: start;
+    /* the desktop rule's 90rem top gap (a leftover of the removed © line)
+       is far too much at phone scale */
+    margin: var(--line-gap) 0 0 calc(64rem / var(--sr) + var(--pad));
+    min-height: calc(150rem / var(--sr));
+  }
   .sp-s3::after { height: calc(128rem / var(--sr)); }
   .sp-s4 { grid-area: 7 / 1 / 8 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
   .sp-s4::after { height: calc(64rem / var(--sr)); }
