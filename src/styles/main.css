@@ -601,6 +601,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   /* tablets in portrait join the mobile layout, but the phone-tuned
      scale must not balloon on a 1024px-wide screen — clamp the root */
   html { font-size: min(1vw, 5.2px); }
+  .nav-grid-btn { display: none; } /* desktop-only control */
+  .nav { justify-content: flex-end; } /* lone pill group stays right */
   :root {
     --sr: 3.93;
     --h1-size: calc(42rem / var(--sr));
@@ -772,6 +774,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .heart-static { width: 52vw; top: 30%; }
   .hg-name { margin-top: 36svh; }
   /* start one column earlier + clear the fixed nav pills: the address
-     must fit two lines */
-  .hero-meta { grid-area: 1 / 2 / 2 / 7; padding-right: calc(100rem / var(--sr)); }
+     must fit exactly two lines */
+  .hero-meta { grid-area: 1 / 2 / 2 / 7; padding-right: calc(84rem / var(--sr)); }
+  .hero-meta .p1 { font-size: calc(11rem / var(--sr)); }
 }
