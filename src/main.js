@@ -78,7 +78,7 @@ const chatNote = document.querySelector('[data-chat]')
 if (chatNote) {
   // NBSPs pin each '·' to the name before it — lines may break only
   // after a separator, never before it and never inside a name
-  const NAMES = ['Michael Dop', ' · Basic 7', ' · Preesh', ' · Dvinskikh', ' · Ika']
+  const NAMES = ['Michael\u00A0Dop', '\u00A0\u00B7 Basic\u00A07', '\u00A0\u00B7 Preesh', '\u00A0\u00B7 Dvinskikh', '\u00A0\u00B7 Ika']
   const CHAT_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
   const l1 = chatNote.querySelector('.hn-1')
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
