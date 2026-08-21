@@ -71,6 +71,47 @@ document.querySelectorAll('[data-egg]').forEach((el) => {
   })
 })
 
+// ---------- hero note types itself in like a chat message ----------
+// iMessage pattern: typing dots, then the message lands in CHUNKS (per
+// name, never per letter), each name striking its drum-machine voice
+const chatNote = document.querySelector('[data-chat]')
+if (chatNote) {
+  const NAMES = ['Michael Dop', ' · Basic 7', ' · Preesh', ' · Dvinskikh', ' · Ika']
+  const CHAT_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
+  const l1 = chatNote.querySelector('.hn-1')
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const finish = () => {
+    l1.textContent = NAMES.join('')
+    chatNote.classList.remove('is-typing')
+    chatNote.classList.add('is-in', 'is-done')
+  }
+  const play = () => {
+    chatNote.classList.add('is-in', 'is-typing')
+    setTimeout(() => {
+      chatNote.classList.remove('is-typing')
+      let i = 0
+      const step = () => {
+        if (i >= NAMES.length) {
+          setTimeout(() => chatNote.classList.add('is-done'), 220)
+          return
+        }
+        l1.textContent += NAMES[i]
+        hit(CHAT_VOICES[i])
+        i += 1
+        setTimeout(step, 170)
+      }
+      step()
+    }, 900)
+  }
+  if (reduced) finish()
+  else {
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); play() }
+    }, { threshold: 0.6 })
+    io.observe(chatNote)
+  }
+}
+
 // ---------- grid overlay toggle ----------
 const gridBtn = document.querySelector('[data-grid-toggle]')
 const gridOverlay = document.querySelector('[data-grid-overlay]')
