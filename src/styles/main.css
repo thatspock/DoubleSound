@@ -593,13 +593,15 @@ sup { font-size: 0.55em; vertical-align: super; }
   .tickets-link h1 { font-size: calc(110rem / var(--sr)); }
 
   .f-l1 { grid-area: 1 / 1 / 2 / 7; }
-  .f-l2 { grid-area: 2 / 1 / 3 / 7; }
+  /* reference-style step: the second manifest line starts at the left
+     edge of the black heart tile in the timer below */
+  .f-l2 { grid-area: 2 / 2 / 3 / 7; margin-top: calc(8rem / var(--sr)); padding-left: calc(18rem / var(--sr)); }
   /* closing block = one mobile viewport; six rows, meta gets its own */
   .f-closing {
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: auto auto 1fr auto auto auto;
   }
-  .f-count { margin: calc(20rem / var(--sr)) 0 0; }
+  .f-count { margin: calc(10rem / var(--sr)) 0 0; }
   .f-count-label { grid-area: 2 / 1 / 3 / 7; margin: calc(16rem / var(--sr)) 0 calc(20rem / var(--sr)); }
   /* no fluid reveal on mobile — difference-blended white type would just
      vanish on the white page (Safari), so plain ink here */
@@ -640,7 +642,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
   /* the entire footer — manifest, timer, wordmark — is one phone screen */
   .footer-grid {
-    padding-top: calc(32rem / var(--sr));
+    padding-top: calc(14rem / var(--sr));
     min-height: calc(100svh - calc(40rem / var(--sr)) - var(--footer-pad-b));
     grid-template-rows: auto auto 1fr;
   }
