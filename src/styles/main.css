@@ -38,7 +38,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  font-size: 1vw;
+  font-size: min(1vw, 1.6svh);
   background: var(--bg);
   scrollbar-width: none;
 }
@@ -774,10 +774,24 @@ sup { font-size: 0.55em; vertical-align: super; }
    geometry retuned for the squarer aspect (svh constants shift) */
 @media (min-width: 640px) and (max-width: 1024px) {
   html { font-size: min(1vw, 7.2px); }
-  .heart-static { width: 52vw; top: 30%; }
-  .hg-name { margin-top: 36svh; }
+  .heart-static { width: 52vw; top: 25%; }
+  /* the wordmark grazes the stone's chin on ANY portrait tablet:
+     25svh (stone centre) + 29vw (half its height) minus the header row —
+     the whole message then lands inside the first viewport */
+  .hg-name { margin-top: calc(25svh + 29vw - 155rem / var(--sr)); }
+  .hg-years { margin-top: 2svh; }
+  .hg-date { margin-top: 1svh; }
   /* start one column earlier + clear the fixed nav pills: the address
-     must fit exactly two lines */
-  .hero-meta { grid-area: 1 / 2 / 2 / 7; padding-right: calc(90rem / var(--sr)); margin-top: 0; }
+     must fit exactly two lines, top-flush */
+  .hero-meta { grid-area: 1 / 2 / 2 / 7; padding-left: 0; padding-right: calc(90rem / var(--sr)); margin-top: 0; }
   .hero-meta .p1 { font-size: calc(11rem / var(--sr)); }
+}
+/* tall-but-short tablets (iPad mini portrait): the same stack is a touch
+   too tall for the 1024px fold — let the height cap the scale */
+@media (min-width: 640px) and (max-width: 1024px) and (orientation: portrait) {
+  html { font-size: min(1vw, 7.2px, 0.63svh); }
+  /* stone starts BELOW the two meta lines (it grazed the address on the
+     squarer minis); the wordmark formula shifts with it */
+  .heart-static { top: 28%; }
+  .hg-name { margin-top: calc(28svh + 29vw - 155rem / var(--sr)); }
 }

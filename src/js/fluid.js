@@ -32,7 +32,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
   // looping hearts video is the hidden layer; the still heart covers
   // the first moments while it buffers
   const video = document.createElement('video')
-  video.src = '/assets/heart-loop.mp4'
+  video.src = '/assets/heart-loop-3.mp4'
   video.muted = true
   video.loop = true
   video.playsInline = true

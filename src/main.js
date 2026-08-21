@@ -15,7 +15,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
-import { initSmoke } from './js/smoke.js'
+import { initLiquidTrail } from './js/liquid-trail.js'
 import { hit, initSfx, windTouch, spin } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -123,10 +123,11 @@ if (chatNote) {
   }
 }
 
-// ---------- smoke toggle (the grey square, desktop only) ----------
-const smoke = initSmoke()
+// ---------- liquid wake toggle (the grey square, desktop only) ----------
+const smoke = initLiquidTrail()
 const gridBtn = document.querySelector('[data-grid-toggle]')
 if (smoke && gridBtn) {
+  gridBtn.classList.add('is-off') // effect starts off
   gridBtn.addEventListener('click', () => gridBtn.classList.toggle('is-off', !smoke.toggle()))
 }
 
