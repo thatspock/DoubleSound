@@ -326,11 +326,16 @@ function playHit(kind) {
 }
 
 export function hit(kind) {
-  if (!ctx || ctx.state !== 'running') {
-    // no context yet (or still waking) — remember the strike; the unlock
-    // handler fires it the moment the same gesture opens the audio
+  if (!ctx) {
+    // no context yet — the unlock handler (same gesture) replays this
     pending = { kind, ts: performance.now() }
     return
+  }
+  if (ctx.state !== 'running') {
+    // schedule on the sleeping context anyway: notes queued at t=now
+    // sound the instant resume() lands inside this same touch — waiting
+    // for the promise made iOS swallow the first tap
+    ctx.resume().catch(() => {})
   }
   playHit(kind)
 }
@@ -344,10 +349,11 @@ export function crackle() {
 // gliding upward; consecutive clicks (momentum) push the glide higher,
 // like something spinning up. Quiet by design.
 export function spin(momentum = 1) {
-  if (!ctx || ctx.state !== 'running') {
+  if (!ctx) {
     pending = { kind: 'crackle', ts: performance.now() }
     return
   }
+  if (ctx.state !== 'running') ctx.resume().catch(() => {})
   const t = ctx.currentTime
   const m = Math.min(momentum, 6)
   const o = ctx.createOscillator()
