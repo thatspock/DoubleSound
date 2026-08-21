@@ -122,22 +122,16 @@ sup { font-size: 0.55em; vertical-align: super; }
 /* ---------------- nav ---------------- */
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 90;
-  /* grid square is parked — lone pill group pins right; back to space-between when it returns */
-  display: flex; justify-content: flex-end; align-items: center;
+  display: flex; justify-content: space-between; align-items: center;
   padding: var(--pad);
   pointer-events: none;
 }
+/* decorative only — clicks pass through */
 .nav-grid-btn {
-  display: none; /* parked: gets a new role later */
   width: calc(16rem / var(--sr));
   height: calc(16rem / var(--sr));
-  border: none;
   background: rgba(0, 0, 0, 0.14);
-  cursor: pointer;
-  pointer-events: auto;
 }
-.nav-grid-btn:hover { background: rgba(0, 0, 0, 0.28); }
-.nav-grid-btn.is-off { background: rgba(0, 0, 0, 0.06); }
 .nav-right { display: flex; align-items: center; gap: calc(8rem / var(--sr)); }
 .nav-cta {
   pointer-events: auto;
