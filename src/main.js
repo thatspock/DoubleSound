@@ -15,7 +15,6 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
-import { initLiquidTrail } from './js/liquid-trail.js'
 import { hit, initSfx, windTouch, spin } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -123,13 +122,8 @@ if (chatNote) {
   }
 }
 
-// ---------- liquid wake toggle (the grey square, desktop only) ----------
-const smoke = initLiquidTrail()
-const gridBtn = document.querySelector('[data-grid-toggle]')
-if (smoke && gridBtn) {
-  gridBtn.classList.add('is-off') // effect starts off
-  gridBtn.addEventListener('click', () => gridBtn.classList.toggle('is-off', !smoke.toggle()))
-}
+// the grey square is parked (hidden in CSS) until it gets a new job;
+// the liquid wake lives on in js/liquid-trail.js, currently unwired
 
 // ---------- nav link char-roll ----------
 document.querySelectorAll('[data-roll]').forEach((el) => {
