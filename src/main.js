@@ -15,7 +15,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
-import { hit, initSfx } from './js/sfx.js'
+import { hit, initSfx, windTouch } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -89,40 +89,24 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
   })
 })
 
-// ---------- lineup keyboard ----------
+// ---------- lineup: the words strike, the empty air breathes ----------
 // Michael Dop = kick · Basic 7 = bass · Preesh = clap · Dvinskikh = hat ·
-// Ika = acid pluck (pentatonic). The whole section is split into
-// full-width bands (row top to next row top), so sweeping anywhere —
-// not just over the glyphs — plays the lineup like an instrument.
+// Ika = acid pluck (pentatonic). Off the glyphs, movement swells a
+// barely-there wind that fades away on its own.
 const ARTIST_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
-const artistRows = [...document.querySelectorAll('.artist')]
-const artistsWrap = document.querySelector('.artists')
-if (artistsWrap && artistRows.length) {
-  let band = -1
-  const pulse = (i) => {
-    const h = artistRows[i].querySelector('h1')
-    gsap.timeline()
-      .to(h, { x: '1.2vw', duration: 0.16, ease: 'power3.out' })
-      .to(h, { x: 0, duration: 0.5, ease: 'power3.out' })
-  }
-  const bandAt = (y) => {
-    for (let i = artistRows.length - 1; i >= 0; i--) {
-      if (y >= artistRows[i].getBoundingClientRect().top) return i
-    }
-    return -1
-  }
-  const strike = (i) => {
-    if (i < 0) return
-    hit(ARTIST_VOICES[i % ARTIST_VOICES.length])
-    pulse(i)
-  }
-  artistsWrap.addEventListener('pointermove', (e) => {
-    const i = bandAt(e.clientY)
-    if (i !== band) { band = i; strike(i) }
+document.querySelectorAll('[data-artist]').forEach((el, i) => {
+  const voice = ARTIST_VOICES[i % ARTIST_VOICES.length]
+  el.addEventListener('mouseenter', () => {
+    hit(voice)
+    gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' })
   })
-  artistsWrap.addEventListener('pointerdown', (e) => strike(bandAt(e.clientY)))
-  artistsWrap.addEventListener('pointerleave', () => { band = -1 })
-}
+  el.addEventListener('pointerdown', () => hit(voice)) // mobile taps; throttle absorbs the desktop double
+  el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
+})
+const artistsWrap = document.querySelector('.artists')
+const windIfEmpty = (e) => { if (!e.target.closest('[data-artist]')) windTouch() }
+artistsWrap?.addEventListener('pointermove', windIfEmpty)
+artistsWrap?.addEventListener('pointerdown', windIfEmpty)
 
 // ---------- sticky bottom name ----------
 const stickyName = document.querySelector('[data-sticky-name]')

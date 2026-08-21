@@ -111,6 +111,49 @@ const VOICES = {
   },
 }
 
+// barely-there wind for the empty air between the names: movement swells
+// it in softly, stillness lets it fade out on its own
+let wind = null
+function ensureWind() {
+  if (wind) return
+  const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate)
+  const d = buf.getChannelData(0)
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
+  const src = ctx.createBufferSource()
+  src.buffer = buf
+  src.loop = true
+  const bp = ctx.createBiquadFilter()
+  bp.type = 'bandpass'
+  bp.frequency.value = 620
+  bp.Q.value = 0.6
+  const g = ctx.createGain()
+  g.gain.value = 0
+  // slow LFO on the filter — the howl
+  const lfo = ctx.createOscillator()
+  lfo.frequency.value = 0.17
+  const lfoAmp = ctx.createGain()
+  lfoAmp.gain.value = 240
+  lfo.connect(lfoAmp)
+  lfoAmp.connect(bp.frequency)
+  src.connect(bp)
+  bp.connect(g)
+  g.connect(master)
+  src.start()
+  lfo.start()
+  wind = g
+}
+
+export function windTouch() {
+  ensure()
+  if (!ctx || ctx.state !== 'running') return
+  ensureWind()
+  const t = ctx.currentTime
+  const g = wind.gain
+  g.cancelScheduledValues(t)
+  g.setTargetAtTime(0.07, t, 0.3)      // swell in while the cursor moves
+  g.setTargetAtTime(0, t + 0.35, 0.9)  // and die down once it stops
+}
+
 function crackleLayer(t) {
   const dur = 0.025 + Math.random() * 0.04
   const n = noiseSrc(dur)
