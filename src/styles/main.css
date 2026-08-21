@@ -638,7 +638,9 @@ sup { font-size: 0.55em; vertical-align: super; }
      at 64rem + pad, the text a line-gap's breath to its right */
   /* line 1 rides level with the pills; the wider address line clears
      their bottom edge before it crosses their column */
-  .hero-meta { grid-area: 1 / 1 / 2 / 7; margin-top: 0; padding-right: 0; padding-left: calc(64rem / var(--sr) + var(--pad) + 14rem / var(--sr)); gap: calc(8rem / var(--sr)); }
+  /* set like the brand caption on the left: same tight leading, the two
+     lines read as one block level with the pills */
+  .hero-meta { grid-area: 1 / 1 / 2 / 7; margin-top: 0; padding-right: 0; padding-left: calc(64rem / var(--sr) + var(--pad) + 6rem / var(--sr)); gap: 0; }
   .hero-meta .p1 { font-size: calc(11rem / var(--sr)); }
   /* start right below the floating heart so the full message fits the fold */
   /* the name slides UNDER the stone: same negative-z trick as the rule;
@@ -697,7 +699,8 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   /* the giant counter overflows a phone screen at desktop size */
   .pre-count { font-size: calc(96rem / var(--sr)); }
-  .pre-tag { max-width: 46vw; text-align: right; }
+  /* the tag moves to the top corner: at 100% the counter reaches under it */
+  .pre-tag { max-width: 46vw; text-align: right; top: var(--pad); bottom: auto; }
   .lineup { padding-top: calc(84rem / var(--sr)); }
   .f-logo-cell { width: calc(70rem / var(--sr)); padding: calc(12rem / var(--sr)) calc(18rem / var(--sr)); }
   .f-r1 { grid-area: 3 / 3 / 4 / 7; }
