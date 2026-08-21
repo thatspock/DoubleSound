@@ -9,6 +9,8 @@
   <meta property="og:description" content="One night at K-30 — Michael Dop, Basic 7 Live, Preesh Live, Dvinskikh, Ika. 28.08, doors 23:00." />
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <!-- the preloader gates on this image; fetch it with the HTML, not after the JS bundle -->
+  <link rel="preload" as="image" href="/assets/heart-face.webp" fetchpriority="high" />
   <script>
     // a refresh always opens at the top; iOS restores scroll async and
     // on bfcache returns module scripts never re-run — pageshow covers both

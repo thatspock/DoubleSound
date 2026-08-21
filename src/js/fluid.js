@@ -30,14 +30,23 @@ export function initFluidReveal({ onHeartClick } = {}) {
   heart.src = '/assets/heart-face.webp'
 
   // looping hearts video is the hidden layer; the still heart covers
-  // the first moments while it buffers
+  // the first moments while it buffers. Its 1.6MB must not race the
+  // fonts/hero image through the pipe — src waits for window load.
   const video = document.createElement('video')
-  video.src = '/assets/heart-loop-3.mp4'
   video.muted = true
   video.loop = true
   video.playsInline = true
-  video.preload = 'auto'
-  video.play().catch(() => {})
+  let running = false // the render loop only spins while the hero is on screen
+  let raf = 0
+  let videoStarted = false
+  const startVideo = () => {
+    if (videoStarted) return
+    videoStarted = true
+    video.src = '/assets/heart-loop-3.mp4'
+    if (running) video.play().catch(() => {})
+  }
+  if (document.readyState === 'complete') startVideo()
+  else window.addEventListener('load', startVideo, { once: true })
 
   function drawChip(c, text, x, y, dark, rot) {
     c.save()
@@ -210,7 +219,7 @@ export function initFluidReveal({ onHeartClick } = {}) {
     ctx.clearRect(0, 0, W, H)
     ctx.drawImage(content, 0, 0)
 
-    requestAnimationFrame(frame)
+    if (running) raf = requestAnimationFrame(frame)
   }
 
   const hero = document.querySelector('.hero')
@@ -251,5 +260,17 @@ export function initFluidReveal({ onHeartClick } = {}) {
   window.addEventListener('resize', resize)
   resize()
 
-  requestAnimationFrame(frame)
+  // the reveal only exists inside the hero — below the fold the loop's
+  // full-canvas blurs + video decode are pure waste, so both sleep
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && !running) {
+      running = true
+      if (videoStarted) video.play().catch(() => {})
+      raf = requestAnimationFrame(frame)
+    } else if (!entry.isIntersecting && running) {
+      running = false
+      cancelAnimationFrame(raf)
+      video.pause()
+    }
+  }).observe(wrap)
 }

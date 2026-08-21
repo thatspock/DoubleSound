@@ -1,5 +1,4 @@
 import '@fontsource-variable/inter-tight'
-import '@fontsource-variable/inter-tight/wght-italic.css'
 import './styles/main.css'
 
 import { gsap } from 'gsap'
