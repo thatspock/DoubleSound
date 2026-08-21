@@ -280,7 +280,8 @@ sup { font-size: 0.55em; vertical-align: super; }
 .hero-note {
   grid-area: 5 / 4 / 6 / 7;
   margin-top: calc(56rem / var(--sr));
-  color: var(--ink-strong);
+  /* colour lives in the difference block above: #b0b0ad -> #40403e on
+     paper. ink-strong here turned the blend pale — don't put it back */
   padding-left: var(--line-gap);
 }
 
@@ -567,7 +568,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .heart-static {
     display: block;
     position: absolute;
-    width: 78vw; left: 50%; top: 34%;
+    width: 72vw; left: 50%; top: 37%;
     transform: translate(-50%, -50%);
     animation: heart-float 7s ease-in-out infinite;
   }
@@ -584,7 +585,9 @@ sup { font-size: 0.55em; vertical-align: super; }
   .brand-cell { grid-area: 1 / 1 / 2 / 3; }
   .hero-meta { grid-area: 1 / 3 / 2 / 7; padding-right: calc(64rem / var(--sr)); }
   /* start right below the floating heart so the full message fits the fold */
-  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 34vh; }
+  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 40vh; }
+  .hg-years { margin-top: calc(18rem / var(--sr)); }
+  .hg-date { margin-top: calc(10rem / var(--sr)); }
   .hg-years { grid-area: 3 / 1 / 4 / 7; }
   .hg-date { grid-area: 4 / 1 / 5 / 7; }
   .hero-note { grid-area: 5 / 1 / 6 / 7; margin-top: calc(40rem / var(--sr)); }
@@ -709,7 +712,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   }
   .sp-s3::after { height: calc(128rem / var(--sr)); }
   .sp-s4 { grid-area: 7 / 1 / 8 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
-  .sp-s4::after { height: calc(64rem / var(--sr)); }
+  /* fill the Ika->Facts corridor, one line-gap short of each block */
+  .sp-s4::after { top: var(--line-gap); height: calc(104rem / var(--sr)); }
 
   .sticky-name, .scrollbar { display: none; }
 }
