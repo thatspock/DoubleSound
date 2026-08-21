@@ -59,7 +59,8 @@ document.querySelectorAll('[data-heart-spin]').forEach((el) => {
 // the same cursor pill marks every hidden hotspot: spin hearts, egg rows
 if (window.matchMedia('(hover: hover)').matches) {
   document.querySelectorAll('[data-heart-spin], [data-egg]').forEach((el) => {
-    el.addEventListener('pointermove', (e) => { moveHint(e.clientX, e.clientY); showHint() })
+    const overDark = el.classList.contains('f-logo-cell') // the black countdown tile
+    el.addEventListener('pointermove', (e) => { moveHint(e.clientX, e.clientY); showHint(overDark) })
     el.addEventListener('pointerleave', hideHint)
   })
 }

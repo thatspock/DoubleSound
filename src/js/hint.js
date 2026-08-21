@@ -21,8 +21,10 @@ export function moveHint(x, y) {
   n.style.top = `${y}px`
 }
 
-export function showHint() {
-  ensure().classList.add('is-on')
+export function showHint(overDark = false) {
+  const n = ensure()
+  n.classList.add('is-on')
+  n.classList.toggle('is-light', overDark)
 }
 
 export function hideHint() {

@@ -223,7 +223,16 @@ export function initFluidReveal({ onHeartClick } = {}) {
       pointer.x * DPR > heartBox.x && pointer.x * DPR < heartBox.x + heartBox.w &&
       pointer.y * DPR > heartBox.y && pointer.y * DPR < heartBox.y + heartBox.h
     hero.style.cursor = inHeart ? 'pointer' : ''
-    if (inHeart) { moveHint(e.clientX, e.clientY); showHint() } else hideHint()
+    if (inHeart) {
+      moveHint(e.clientX, e.clientY)
+      // the pill flips light when the revealed video under the cursor is dark
+      let overDark = false
+      try {
+        const p = cctx.getImageData(Math.round(pointer.x * DPR), Math.round(pointer.y * DPR), 1, 1).data
+        overDark = p[3] > 128 && (p[0] + p[1] + p[2]) / 3 < 70
+      } catch { /* out of bounds — stay dark-on-light */ }
+      showHint(overDark)
+    } else hideHint()
   })
   hero.addEventListener('pointerleave', hideHint)
   hero.addEventListener('click', (e) => {

@@ -512,6 +512,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   transition: opacity var(--dur-s) var(--ease-out), transform var(--dur-s) var(--ease-out);
 }
 .cursor-hint.is-on { opacity: 1; transform: translate(14%, -130%) rotate(-6deg) scale(1); }
+/* over a dark hotspot the pill flips light so it never melts away */
+.cursor-hint.is-light { background: #d1d1cd; color: var(--green-2); }
 
 /* ---------------- sticky name ---------------- */
 .sticky-name {
