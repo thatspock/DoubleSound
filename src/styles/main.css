@@ -299,14 +299,17 @@ sup { font-size: 0.55em; vertical-align: super; }
 /* grid-stack (no absolutes): ghost, live text and typing dots share one
    cell — the ghost of the final text fixes the bubble's size, the rest
    overlays natively */
-.hn-1w { display: inline-grid; }
+.hn-1w { display: inline-grid; vertical-align: top; }
+/* the bubble's box is set in stone: two text lines + padding, no phase
+   (dots, typing, done) may change it */
+.hero-note { line-height: var(--p1-lh); }
 .hn-1w > * { grid-area: 1 / 1; }
 .hn-ghost { visibility: hidden; }
 .hn-1 { white-space: pre-line; }
 /* controlled, symmetric line breaks — same four lines on every screen,
    so the ghost and the typed text always wrap identically */
 .hn-dots { display: none; justify-self: start; align-self: start; }
-.hero-note.is-typing .hn-dots { display: flex; align-items: center; height: 1em; }
+.hero-note.is-typing .hn-dots { display: flex; align-items: center; height: calc(var(--p1-size) * 1.12); }
 .hn-dots span {
   display: inline-block;
   width: calc(5rem / var(--sr));
