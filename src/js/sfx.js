@@ -109,37 +109,37 @@ const VOICES = {
     n.start(t); n.stop(t + 0.05)
   },
   pluck(t) {
-    // the "guitar": a physically-modelled string (Karplus–Strong) walking
-    // the pentatonic, warm-filtered, with a crystal bell cap and a quiet
-    // dub-delay tail — deep, hypnotic, california
-    const notes = [220, 261.63, 329.63, 392, 440]
+    // rominimal guitar: a muted low string (Karplus–Strong, softened
+    // excitation), dark-filtered, with a tuned sub-tom underneath and a
+    // deep muffled dub tail — dry, woody, hypnotic
+    const notes = [110, 130.81, 164.81, 196, 220] // A minor pent, an octave down
     const f = notes[Math.floor(Math.random() * notes.length)]
     const out = ctx.createGain()
-    out.gain.setValueAtTime(0.34, t)
-    out.gain.setTargetAtTime(0, t + 0.9, 0.35)
+    out.gain.setValueAtTime(0.42, t)
+    out.gain.setTargetAtTime(0, t + 0.7, 0.3)
     const lp = ctx.createBiquadFilter()
     lp.type = 'lowpass'
-    lp.frequency.value = 3200
-    // two strings a hair apart — the silk
-    for (const det of [1, 1.004]) {
+    lp.frequency.value = 1300
+    for (const det of [1, 1.003]) {
       const src = ctx.createBufferSource()
       src.buffer = pluckString(f * det)
       src.connect(lp)
       src.start(t)
-      src.stop(t + 1.6)
+      src.stop(t + 1.4)
     }
     lp.connect(out)
     out.connect(master)
     out.connect(ensurePluckEcho())
-    // crystal cap: a tiny bell one octave up
-    const bell = ctx.createOscillator()
-    bell.type = 'sine'
-    bell.frequency.value = f * 2
-    const bg = env(t, 0.07, 0.5)
-    bell.connect(bg)
-    bg.connect(master)
-    bell.start(t)
-    bell.stop(t + 0.55)
+    // tuned sub-tom body under the string
+    const sub = ctx.createOscillator()
+    sub.type = 'sine'
+    sub.frequency.setValueAtTime(f / 2, t)
+    sub.frequency.exponentialRampToValueAtTime(f / 2.4, t + 0.12)
+    const sg = env(t, 0.2, 0.14)
+    sub.connect(sg)
+    sg.connect(master)
+    sub.start(t)
+    sub.stop(t + 0.16)
   },
 }
 
@@ -153,12 +153,17 @@ function pluckString(freq) {
   const N = Math.max(2, Math.round(sr / freq))
   const ring = new Float32Array(N)
   for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1
+  // soften the excitation — a finger, not a pick: two smoothing passes
+  for (let p = 0; p < 2; p++) {
+    let prev = ring[N - 1]
+    for (let i = 0; i < N; i++) { const c = ring[i]; ring[i] = (c + prev) / 2; prev = c }
+  }
   let idx = 0
   for (let i = 0; i < d.length; i++) {
     const cur = ring[idx]
     const nxt = ring[(idx + 1) % N]
     d[i] = cur
-    ring[idx] = 0.996 * 0.5 * (cur + nxt)
+    ring[idx] = 0.993 * 0.5 * (cur + nxt)
     idx = (idx + 1) % N
   }
   return buf
@@ -172,15 +177,15 @@ function ensurePluckEcho() {
   const send = ctx.createGain()
   send.gain.value = 0.18
   const dly = ctx.createDelay(1)
-  dly.delayTime.value = 0.28
+  dly.delayTime.value = 0.34
   const fb = ctx.createGain()
-  fb.gain.value = 0.4
+  fb.gain.value = 0.45
   const bp = ctx.createBiquadFilter()
   bp.type = 'bandpass'
-  bp.frequency.value = 1200
-  bp.Q.value = 1.1
+  bp.frequency.value = 650
+  bp.Q.value = 1.0
   const wet = ctx.createGain()
-  wet.gain.value = 0.5
+  wet.gain.value = 0.38
   send.connect(dly)
   dly.connect(bp)
   bp.connect(fb)
