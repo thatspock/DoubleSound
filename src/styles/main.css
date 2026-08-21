@@ -594,7 +594,10 @@ sup { font-size: 0.55em; vertical-align: super; }
 }
 
 /* ---------------- mobile ---------------- */
-@media (max-width: 991px) {
+@media (max-width: 1024px) {
+  /* tablets in portrait join the mobile layout, but the phone-tuned
+     scale must not balloon on a 1024px-wide screen — clamp the root */
+  html { font-size: min(1vw, 5.2px); }
   :root {
     --sr: 3.93;
     --h1-size: calc(42rem / var(--sr));

@@ -10,7 +10,7 @@ const DPR = Math.min(window.devicePixelRatio || 1, 2)
 export function initFluidReveal({ onHeartClick } = {}) {
   const wrap = document.querySelector('[data-reveal-wrap]')
   const canvas = document.querySelector('[data-fluid]')
-  if (!wrap || !canvas || window.matchMedia('(max-width: 991px)').matches) return
+  if (!wrap || !canvas || window.matchMedia('(max-width: 1024px)').matches) return
 
   const ctx = canvas.getContext('2d')
   const layer = document.createElement('canvas')
