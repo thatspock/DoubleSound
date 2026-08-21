@@ -311,8 +311,9 @@ sup { font-size: 0.55em; vertical-align: super; }
 }
 .artist h1 { transition: color var(--dur-s) var(--ease-out); }
 @media (hover: hover) { .artist h1:hover { color: var(--green); } }
-/* tap feedback on touch — the strike flashes the name green */
-.artist.is-struck h1 { color: var(--green); }
+/* tap feedback on touch — the strike flashes the name green
+   (data-artist IS the h1, so the class lands on the heading itself) */
+.artist h1.is-struck { color: var(--green); }
 .a-1 { grid-column: 2 / 8; }
 .a-2 { grid-column: 3 / 9; }
 .a-3 { grid-column: 5 / 9; }
