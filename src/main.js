@@ -26,6 +26,14 @@ gsap.ticker.add((t) => lenis.raf(t * 1000))
 gsap.ticker.lagSmoothing(0)
 lenis.stop()
 
+// vw typography means the document height changes with window width —
+// a stale Lenis limit stops the page short of its real bottom
+let resizeT = null
+new ResizeObserver(() => {
+  clearTimeout(resizeT)
+  resizeT = setTimeout(() => { lenis.resize(); ScrollTrigger.refresh() }, 150)
+}).observe(document.body)
+
 // ---------- heart silhouettes ----------
 document.querySelectorAll('[data-heart-path]').forEach((p) => p.setAttribute('d', HEART_D))
 
@@ -103,8 +111,17 @@ document.querySelectorAll('[data-artist]').forEach((el, i) => {
   el.addEventListener('pointerdown', () => hit(voice)) // mobile taps; throttle absorbs the desktop double
   el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
 })
+// wind pitch = the note of whichever instrument's field the cursor is in
+// (A/C/E/G/A up the rows — same A-minor world as the strikes)
+const WIND_TONES = [440, 523.25, 659.25, 783.99, 880]
 const artistsWrap = document.querySelector('.artists')
-const windIfEmpty = (e) => { if (!e.target.closest('[data-artist]')) windTouch() }
+const artistRows = [...document.querySelectorAll('.artist')]
+const windIfEmpty = (e) => {
+  if (e.target.closest('[data-artist]')) return
+  let i = artistRows.length - 1
+  while (i >= 0 && e.clientY < artistRows[i].getBoundingClientRect().top) i--
+  windTouch(i >= 0 ? WIND_TONES[i % WIND_TONES.length] : WIND_TONES[0])
+}
 artistsWrap?.addEventListener('pointermove', windIfEmpty)
 artistsWrap?.addEventListener('pointerdown', windIfEmpty)
 

@@ -228,6 +228,17 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 .hg { display: flex; flex-direction: column; align-items: flex-start; }
 
+/* liquid inversion: hero type over the dark reveal flips light per-pixel,
+   the part lying on white stays ink — same difference trick as the logo */
+.hero .hg h1, .p-the, .p-best, .p-mid, .p-end {
+  color: var(--white);
+  mix-blend-mode: difference;
+}
+.hero-meta, .hero-note, .hero-copy {
+  color: var(--white);
+  mix-blend-mode: difference;
+}
+
 /* the whole message — name, sixteen years ×K-30, one night 28.08 —
    must finish inside the first viewport; the fluid stage lives beneath it */
 .hg-name { grid-area: 2 / 4 / 3 / 8; margin-top: calc(36rem / var(--sr)); padding-left: var(--line-gap); }
@@ -347,7 +358,7 @@ sup { font-size: 0.55em; vertical-align: super; }
 .tickets-note { color: var(--ink-strong); }
 
 /* ---------------- footer ---------------- */
-.footer { padding: calc(40rem / var(--sr)) var(--pad) 0; overflow: clip; }
+.footer { padding: calc(40rem / var(--sr)) var(--pad) calc(6rem / var(--sr)); overflow: clip; }
 .footer-grid {
   border-top: var(--stroke) solid var(--ink-strong);
   padding-top: calc(90rem / var(--sr));

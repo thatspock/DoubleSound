@@ -132,7 +132,7 @@ function ensureWind() {
   const lfo = ctx.createOscillator()
   lfo.frequency.value = 0.17
   const lfoAmp = ctx.createGain()
-  lfoAmp.gain.value = 240
+  lfoAmp.gain.value = 90 // sway around the zone's note without leaving it
   lfo.connect(lfoAmp)
   lfoAmp.connect(bp.frequency)
   src.connect(bp)
@@ -140,17 +140,20 @@ function ensureWind() {
   g.connect(master)
   src.start()
   lfo.start()
-  wind = g
+  wind = { g, bp }
 }
 
-export function windTouch() {
+// tone follows the instrument whose field the cursor is over, gliding
+// there smoothly so crossing zones sounds liquid, not stepped
+export function windTouch(freq = 620) {
   ensure()
   if (!ctx || ctx.state !== 'running') return
   ensureWind()
   const t = ctx.currentTime
-  const g = wind.gain
+  wind.bp.frequency.setTargetAtTime(freq, t, 0.25)
+  const g = wind.g.gain
   g.cancelScheduledValues(t)
-  g.setTargetAtTime(0.07, t, 0.3)      // swell in while the cursor moves
+  g.setTargetAtTime(0.045, t, 0.3)     // swell in while the cursor moves
   g.setTargetAtTime(0, t + 0.35, 0.9)  // and die down once it stops
 }
 
