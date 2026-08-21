@@ -763,3 +763,12 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   .sticky-name, .scrollbar { display: none; }
 }
+
+/* ---------------- tablet band ----------------
+   mobile layout, but scaled up to fill a 768-1024px canvas; hero
+   geometry retuned for the squarer aspect (svh constants shift) */
+@media (min-width: 640px) and (max-width: 1024px) {
+  html { font-size: min(1vw, 7.2px); }
+  .heart-static { width: 52vw; top: 30%; }
+  .hg-name { margin-top: 36svh; }
+}
