@@ -46,7 +46,8 @@ html::-webkit-scrollbar { display: none; }
 
 body {
   font-family: 'Inter Tight Variable', Arial, sans-serif;
-  background: var(--bg);
+  /* no body background: the page is painted by html, so negative
+     z-index layers (the mobile hero rule under the heart) stay visible */
   color: var(--ink);
   font-size: var(--p1-size);
   line-height: 1;
@@ -630,7 +631,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .pre-count { font-size: calc(96rem / var(--sr)); }
   .pre-tag { max-width: 46vw; text-align: right; }
   .hero-copy { margin-top: calc(32rem / var(--sr)); }
-  .lineup { padding-top: calc(56rem / var(--sr)); }
+  .lineup { padding-top: calc(84rem / var(--sr)); }
   .f-logo-cell { width: calc(70rem / var(--sr)); padding: calc(12rem / var(--sr)) calc(18rem / var(--sr)); }
   .f-r1 { grid-area: 3 / 3 / 4 / 7; }
   .f-r1 .f-indent { padding-left: calc(40rem / var(--sr)); }
@@ -680,9 +681,10 @@ sup { font-size: 0.55em; vertical-align: super; }
     margin: 0 0 0 calc(64rem / var(--sr) + var(--pad));
   }
   .hg-name, .hg-date { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
-  .sp-s3 { grid-area: 9 / 2 / 10 / 3; }
-  .sp-s3::after { height: calc(104rem / var(--sr)); }
-  .sp-s4 { grid-area: 7 / 2 / 8 / 3; }
+  /* lower segments share the same logo-inset axis as the hero rule */
+  .sp-s3 { grid-area: 9 / 1 / 10 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
+  .sp-s3::after { height: calc(128rem / var(--sr)); }
+  .sp-s4 { grid-area: 7 / 1 / 8 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
   .sp-s4::after { height: calc(64rem / var(--sr)); }
 
   .sticky-name, .scrollbar { display: none; }
