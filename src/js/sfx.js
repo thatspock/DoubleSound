@@ -7,6 +7,18 @@ let ctx = null
 let master = null
 let last = 0
 
+// open doublesound.live/#sfx to see this on-screen status (phone debugging)
+let dbg = null
+function debugLine(msg) {
+  if (!location.hash.includes('sfx')) return
+  if (!dbg) {
+    dbg = document.createElement('div')
+    dbg.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:999;background:#1f1f1e;color:#9fdc8f;padding:6px 10px;font:12px monospace;border-radius:8px;pointer-events:none;white-space:pre'
+    document.body.appendChild(dbg)
+  }
+  dbg.textContent = msg
+}
+
 // The context is born ONLY inside a real user gesture — creating it
 // early (on hover) can leave it stuck in 'suspended' on some Chromes,
 // which is why the site used to need the sound-toggle dance to wake up.
@@ -40,13 +52,21 @@ export function initSfx() {
       keepAlive.volume = 1 // the file itself is silence
       keepAlive.play().catch(() => { keepAlive = null })
     }
+    debugLine('unlock: ctx=' + ctx.state + ' keepAlive=' + !!keepAlive)
     ctx.resume().then(() => {
+      debugLine('resume -> ' + ctx.state)
       if (ctx.state !== 'running') return
       UNLOCK_EVENTS.forEach((e) => document.removeEventListener(e, unlock, true))
       console.log('%c[sfx] audio unlocked — the lineup is live', 'color:#609957')
-      if (pending && performance.now() - pending.ts < 600) playHit(pending.kind)
+      // warmup: a near-silent blip validates the whole graph on iOS
+      const o = ctx.createOscillator()
+      const g = ctx.createGain()
+      g.gain.value = 0.001
+      o.connect(g); g.connect(master)
+      o.start(); o.stop(ctx.currentTime + 0.03)
+      if (pending && performance.now() - pending.ts < 1500) { playHit(pending.kind); debugLine('unlocked + replay ' + pending.kind) }
       pending = null
-    }).catch((err) => console.log('[sfx] resume failed:', err?.message))
+    }).catch((err) => { debugLine('resume FAILED: ' + err?.message); console.log('[sfx] resume failed:', err?.message) })
   }
   UNLOCK_EVENTS.forEach((e) => document.addEventListener(e, unlock, true))
 }
@@ -337,12 +357,14 @@ export function hit(kind) {
     return
   }
   if (ctx.state !== 'running') {
-    // schedule on the sleeping context anyway: notes queued at t=now
-    // sound the instant resume() lands inside this same touch — waiting
-    // for the promise made iOS swallow the first tap
+    // schedule now AND queue a replay: desktops hear the scheduled note
+    // the moment resume lands; iOS kills sources started while suspended,
+    // so the unlock handler replays the queued strike after resume
+    pending = { kind, ts: performance.now() }
     ctx.resume().catch(() => {})
   }
   playHit(kind)
+  debugLine('hit ' + kind + ' @' + ctx.state)
 }
 
 // generic glitch tick, kept for non-lineup hotspots

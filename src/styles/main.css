@@ -255,7 +255,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   color: #d1d1cd;
   mix-blend-mode: difference;
 }
-.hero-meta, .hero-note, .hero-copy {
+.hero-meta, .hero-note {
   color: #d1d1cd;
   mix-blend-mode: difference;
 }
@@ -280,12 +280,8 @@ sup { font-size: 0.55em; vertical-align: super; }
 .p-mid { grid-area: 7 / 2 / 8 / 8; margin-top: calc(4rem / var(--sr)); justify-self: start; margin-left: calc(60rem / var(--sr)); }
 .p-end { grid-area: 8 / 2 / 9 / 8; margin-top: calc(4rem / var(--sr)); margin-left: calc(60rem / var(--sr)); }
 
-.hero-copy {
-  grid-area: 9 / 4 / 10 / 6;
-  margin: calc(90rem / var(--sr)) 0 calc(24rem / var(--sr));
-  color: var(--ink-strong);
-  padding-left: var(--line-gap);
-}
+/* row 9 lost its copy line — the spine keeps its length on its own */
+.sp-s3 { min-height: calc(130rem / var(--sr)); margin-top: calc(90rem / var(--sr)); }
 
 /* ---------------- lineup ---------------- */
 .lineup { padding: calc(140rem / var(--sr)) var(--pad) calc(120rem / var(--sr)); }
@@ -586,7 +582,6 @@ sup { font-size: 0.55em; vertical-align: super; }
   .p-best { grid-area: 6 / 3 / 7 / 7; margin-top: calc(60rem / var(--sr)); }
   .p-mid { grid-area: 7 / 1 / 8 / 7; }
   .p-end { grid-area: 8 / 1 / 9 / 7; }
-  .hero-copy { grid-area: 9 / 1 / 10 / 4; margin-bottom: calc(40rem / var(--sr)); }
 
   .lineup-tag { grid-area: 1 / 1 / 2 / 3; align-self: start; justify-self: start; padding: 0 0 calc(6rem / var(--sr)); }
   .artist h1 { font-size: calc(50rem / var(--sr)); }
@@ -617,7 +612,7 @@ sup { font-size: 0.55em; vertical-align: super; }
     color: var(--ink);
     mix-blend-mode: normal;
   }
-  .hero-meta, .hero-note, .hero-copy {
+  .hero-meta, .hero-note {
     color: var(--ink-strong);
     mix-blend-mode: normal;
   }
@@ -632,7 +627,6 @@ sup { font-size: 0.55em; vertical-align: super; }
   /* the giant counter overflows a phone screen at desktop size */
   .pre-count { font-size: calc(96rem / var(--sr)); }
   .pre-tag { max-width: 46vw; text-align: right; }
-  .hero-copy { margin-top: calc(32rem / var(--sr)); }
   .lineup { padding-top: calc(84rem / var(--sr)); }
   .f-logo-cell { width: calc(70rem / var(--sr)); padding: calc(12rem / var(--sr)) calc(18rem / var(--sr)); }
   .f-r1 { grid-area: 3 / 3 / 4 / 7; }
@@ -644,7 +638,6 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   /* desktop spacing keeps its px size on a phone and reads twice as
      heavy — compress the vertical rhythm across all sections */
-  .hero-copy { margin: calc(48rem / var(--sr)) 0 calc(16rem / var(--sr)); }
   .lineup { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
   .facts { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
   .facts-head { margin-bottom: calc(44rem / var(--sr)); }
