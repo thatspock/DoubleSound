@@ -363,14 +363,17 @@ sup { font-size: 0.55em; vertical-align: super; }
   display: flex; align-items: center; justify-content: space-between;
   margin: calc(104rem / var(--sr)) 0 0;
 }
-.f-unit {
-  display: flex; flex-direction: column; align-items: center;
-  gap: calc(10rem / var(--sr));
+/* the label hangs below, out of flow — the row centre-aligns on the
+   DIGITS, so every colon sits on the same optical line */
+.f-unit { position: relative; }
+.f-unit .p1 {
+  position: absolute; top: calc(100% + 8rem / var(--sr)); left: 50%;
+  transform: translateX(-50%);
 }
 .f-count-label {
   grid-area: 4 / 1 / 5 / 9;
   justify-self: center;
-  margin: calc(24rem / var(--sr)) 0 calc(104rem / var(--sr));
+  margin: calc(64rem / var(--sr)) 0 calc(104rem / var(--sr));
   color: var(--ink-strong);
 }
 .f-count h1 { font-variant-numeric: tabular-nums; }
@@ -533,6 +536,11 @@ sup { font-size: 0.55em; vertical-align: super; }
   .f-l2 { grid-area: 2 / 1 / 3 / 7; }
   .f-count { margin: calc(48rem / var(--sr)) 0 0; }
   .f-count-label { grid-area: 4 / 1 / 5 / 7; margin-bottom: calc(48rem / var(--sr)); }
+  /* the giant counter overflows a phone screen at desktop size */
+  .pre-count { font-size: calc(96rem / var(--sr)); }
+  .pre-tag { max-width: 46vw; text-align: right; }
+  .hero-copy { margin-top: calc(32rem / var(--sr)); }
+  .lineup { padding-top: calc(56rem / var(--sr)); }
   .f-logo-cell { width: calc(70rem / var(--sr)); padding: calc(12rem / var(--sr)) calc(18rem / var(--sr)); }
   .f-r1 { grid-area: 5 / 3 / 6 / 7; }
   .f-r1 .f-indent { padding-left: calc(40rem / var(--sr)); }
