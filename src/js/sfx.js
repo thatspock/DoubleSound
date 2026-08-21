@@ -7,6 +7,9 @@ let ctx = null
 let master = null
 let last = 0
 
+// The context is born ONLY inside a real user gesture — creating it
+// early (on hover) can leave it stuck in 'suspended' on some Chromes,
+// which is why the site used to need the sound-toggle dance to wake up.
 function ensure() {
   if (!ctx) {
     ctx = new (window.AudioContext || window.webkitAudioContext)()
@@ -24,6 +27,7 @@ function ensure() {
 const SILENT_WAV = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=='
 const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']
 let keepAlive = null
+let pending = null // the strike that arrived while the context was waking
 
 export function initSfx() {
   const unlock = () => {
@@ -34,9 +38,14 @@ export function initSfx() {
       keepAlive.volume = 0.01
       keepAlive.play().catch(() => { keepAlive = null })
     }
-    if (ctx && ctx.state === 'running') UNLOCK_EVENTS.forEach((e) => document.removeEventListener(e, unlock))
+    ctx.resume().then(() => {
+      if (ctx.state !== 'running') return
+      UNLOCK_EVENTS.forEach((e) => document.removeEventListener(e, unlock, true))
+      if (pending && performance.now() - pending.ts < 600) playHit(pending.kind)
+      pending = null
+    }).catch(() => {})
   }
-  UNLOCK_EVENTS.forEach((e) => document.addEventListener(e, unlock))
+  UNLOCK_EVENTS.forEach((e) => document.addEventListener(e, unlock, true))
 }
 
 function noiseSrc(dur) {
@@ -146,14 +155,13 @@ function ensureWind() {
 // tone follows the instrument whose field the cursor is over, gliding
 // there smoothly so crossing zones sounds liquid, not stepped
 export function windTouch(freq = 620) {
-  ensure()
   if (!ctx || ctx.state !== 'running') return
   ensureWind()
   const t = ctx.currentTime
   wind.bp.frequency.setTargetAtTime(freq, t, 0.25)
   const g = wind.g.gain
   g.cancelScheduledValues(t)
-  g.setTargetAtTime(0.045, t, 0.3)     // swell in while the cursor moves
+  g.setTargetAtTime(0.028, t, 0.3)     // swell in while the cursor moves
   g.setTargetAtTime(0, t + 0.35, 0.9)  // and die down once it stops
 }
 
@@ -177,13 +185,10 @@ function playHit(kind) {
 }
 
 export function hit(kind) {
-  ensure()
-  if (!ctx) return
-  if (ctx.state !== 'running') {
-    // the very first tap arrives while the context is still waking up —
-    // queue the hit so that same gesture is heard, drop it if stale
-    const asked = performance.now()
-    ctx.resume().then(() => { if (performance.now() - asked < 400) playHit(kind) }).catch(() => {})
+  if (!ctx || ctx.state !== 'running') {
+    // no context yet (or still waking) — remember the strike; the unlock
+    // handler fires it the moment the same gesture opens the audio
+    pending = { kind, ts: performance.now() }
     return
   }
   playHit(kind)

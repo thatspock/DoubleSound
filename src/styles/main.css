@@ -189,7 +189,10 @@ sup { font-size: 0.55em; vertical-align: super; }
   overflow: clip;
   z-index: 0;
 }
-.fluid-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* push the stone towards white and the shadows towards black: the
+   difference-blended type then lands near-black on the stone instead of
+   the muddy grey that |1 - 0.84| used to give */
+.fluid-canvas { position: absolute; inset: 0; width: 100%; height: 100%; filter: contrast(1.35) brightness(1.08); }
 .heart-static { display: none; }
 
 .hero-inner {
