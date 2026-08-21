@@ -1,10 +1,10 @@
-// Synthesized UI crackles — Web Audio, no samples. Each hover gets a
+// Synthesized UI crackles — Web Audio, no samples. Each hover/tap gets a
 // randomized vinyl-ish noise burst plus a hair of a click, so no two
-// crackles sound the same. Gated by the nav sound toggle: the site is
-// silent until the visitor explicitly opts in.
+// crackles sound the same. Always on, independent of the music toggle;
+// the only limit is the browser's autoplay policy, so the very first
+// gesture anywhere on the page unlocks the audio context.
 let ctx = null
 let master = null
-let enabled = false
 let last = 0
 
 function ensure() {
@@ -17,13 +17,19 @@ function ensure() {
   if (ctx.state === 'suspended') ctx.resume()
 }
 
-export function setSfxEnabled(v) {
-  enabled = v
-  if (v) ensure()
+export function initSfx() {
+  const unlock = () => {
+    ensure()
+    document.removeEventListener('pointerdown', unlock)
+    document.removeEventListener('keydown', unlock)
+  }
+  document.addEventListener('pointerdown', unlock)
+  document.addEventListener('keydown', unlock)
 }
 
 export function crackle() {
-  if (!enabled || !ctx) return
+  ensure()
+  if (!ctx || ctx.state !== 'running') return
   const now = performance.now()
   if (now - last < 70) return // rapid hover sweeps must not machine-gun
   last = now
