@@ -89,19 +89,40 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
   })
 })
 
-// ---------- artist rows: each one is a drum-machine voice ----------
+// ---------- lineup keyboard ----------
 // Michael Dop = kick · Basic 7 = bass · Preesh = clap · Dvinskikh = hat ·
-// Ika = acid pluck (pentatonic) — sweep the lineup, play minimal techno
+// Ika = acid pluck (pentatonic). The whole section is split into
+// full-width bands (row top to next row top), so sweeping anywhere —
+// not just over the glyphs — plays the lineup like an instrument.
 const ARTIST_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
-document.querySelectorAll('[data-artist]').forEach((el, i) => {
-  const voice = ARTIST_VOICES[i % ARTIST_VOICES.length]
-  el.addEventListener('mouseenter', () => {
-    hit(voice)
-    gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' })
+const artistRows = [...document.querySelectorAll('.artist')]
+const artistsWrap = document.querySelector('.artists')
+if (artistsWrap && artistRows.length) {
+  let band = -1
+  const pulse = (i) => {
+    const h = artistRows[i].querySelector('h1')
+    gsap.timeline()
+      .to(h, { x: '1.2vw', duration: 0.16, ease: 'power3.out' })
+      .to(h, { x: 0, duration: 0.5, ease: 'power3.out' })
+  }
+  const bandAt = (y) => {
+    for (let i = artistRows.length - 1; i >= 0; i--) {
+      if (y >= artistRows[i].getBoundingClientRect().top) return i
+    }
+    return -1
+  }
+  const strike = (i) => {
+    if (i < 0) return
+    hit(ARTIST_VOICES[i % ARTIST_VOICES.length])
+    pulse(i)
+  }
+  artistsWrap.addEventListener('pointermove', (e) => {
+    const i = bandAt(e.clientY)
+    if (i !== band) { band = i; strike(i) }
   })
-  el.addEventListener('pointerdown', () => hit(voice)) // mobile taps; throttle absorbs the desktop double
-  el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
-})
+  artistsWrap.addEventListener('pointerdown', (e) => strike(bandAt(e.clientY)))
+  artistsWrap.addEventListener('pointerleave', () => { band = -1 })
+}
 
 // ---------- sticky bottom name ----------
 const stickyName = document.querySelector('[data-sticky-name]')

@@ -17,14 +17,26 @@ function ensure() {
   if (ctx.state === 'suspended') ctx.resume()
 }
 
+// iOS mutes Web Audio with the ringer switch, but a playing HTMLAudio
+// element flips the session into "media playback", which the switch
+// does not touch — so a silent loop makes the crackles audible on a
+// muted phone. Touch devices only: it steals audio focus otherwise.
+const SILENT_WAV = 'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=='
+const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']
+let keepAlive = null
+
 export function initSfx() {
   const unlock = () => {
     ensure()
-    document.removeEventListener('pointerdown', unlock)
-    document.removeEventListener('keydown', unlock)
+    if (!keepAlive && window.matchMedia('(hover: none)').matches) {
+      keepAlive = new Audio(SILENT_WAV)
+      keepAlive.loop = true
+      keepAlive.volume = 0.01
+      keepAlive.play().catch(() => { keepAlive = null })
+    }
+    if (ctx && ctx.state === 'running') UNLOCK_EVENTS.forEach((e) => document.removeEventListener(e, unlock))
   }
-  document.addEventListener('pointerdown', unlock)
-  document.addEventListener('keydown', unlock)
+  UNLOCK_EVENTS.forEach((e) => document.addEventListener(e, unlock))
 }
 
 function noiseSrc(dur) {
@@ -44,6 +56,7 @@ function env(t, peak, dur) {
 }
 
 const VOICES = {
+  crackle() {}, // bare tick: the crackle layer alone
   kick(t) {
     const o = ctx.createOscillator()
     o.type = 'sine'
@@ -108,9 +121,7 @@ function crackleLayer(t) {
   n.start(t); n.stop(t + dur)
 }
 
-export function hit(kind) {
-  ensure()
-  if (!ctx || ctx.state !== 'running') return
+function playHit(kind) {
   const now = performance.now()
   if (now - last < 55) return // fast sweeps groove, they don't machine-gun
   last = now
@@ -119,12 +130,20 @@ export function hit(kind) {
   crackleLayer(t)
 }
 
+export function hit(kind) {
+  ensure()
+  if (!ctx) return
+  if (ctx.state !== 'running') {
+    // the very first tap arrives while the context is still waking up —
+    // queue the hit so that same gesture is heard, drop it if stale
+    const asked = performance.now()
+    ctx.resume().then(() => { if (performance.now() - asked < 400) playHit(kind) }).catch(() => {})
+    return
+  }
+  playHit(kind)
+}
+
 // generic glitch tick, kept for non-lineup hotspots
 export function crackle() {
-  ensure()
-  if (!ctx || ctx.state !== 'running') return
-  const now = performance.now()
-  if (now - last < 55) return
-  last = now
-  crackleLayer(ctx.currentTime)
+  hit('crackle')
 }
