@@ -121,7 +121,7 @@ function spawn(src, x0, y0, opts = {}) {
 export function dropIka(clickX) {
   if (!logged) {
     logged = true
-    console.log('%cIKA ON THE DECKS — catch him if you can', 'color:#609957;background:#262625;padding:4px 10px;border-radius:10px;font-weight:bold')
+    console.log('%cIKA ON THE DECKS — catch him if you can', 'color:#609957;background:#1f1f1e;padding:4px 10px;border-radius:10px;font-weight:bold')
   }
   spawn('/assets/head-ika.webp', clickX, undefined, { ar: AR_IKA })
 }
