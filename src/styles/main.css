@@ -381,10 +381,12 @@ sup { font-size: 0.55em; vertical-align: super; }
   position: absolute; top: calc(100% + 8rem / var(--sr)); left: 50%;
   transform: translateX(-50%);
 }
+/* the closing block — countdown down to the wordmark — must assemble
+   inside one desktop viewport, so these gaps stay tight */
 .f-count-label {
   grid-area: 4 / 1 / 5 / 9;
   justify-self: center;
-  margin: calc(64rem / var(--sr)) 0 calc(104rem / var(--sr));
+  margin: calc(32rem / var(--sr)) 0 calc(40rem / var(--sr));
   color: var(--ink-strong);
 }
 .f-count h1 { font-variant-numeric: tabular-nums; }
@@ -416,7 +418,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   grid-area: 6 / 3 / 7 / 7;
   display: flex; gap: calc(8rem / var(--sr));
   justify-content: center;
-  margin-top: calc(56rem / var(--sr));
+  margin-top: calc(24rem / var(--sr));
 }
 .badge-pill {
   border: var(--stroke) solid var(--ink-strong);
@@ -435,7 +437,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   grid-area: 7 / 1 / 8 / 9;
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: calc(24rem / var(--sr));
-  margin-top: calc(70rem / var(--sr));
+  margin-top: calc(24rem / var(--sr));
   color: var(--ink-strong);
 }
 .f-final h1 {
@@ -545,8 +547,22 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   .f-l1 { grid-area: 1 / 1 / 2 / 7; }
   .f-l2 { grid-area: 2 / 1 / 3 / 7; }
-  .f-count { margin: calc(48rem / var(--sr)) 0 0; }
-  .f-count-label { grid-area: 4 / 1 / 5 / 7; margin-bottom: calc(48rem / var(--sr)); }
+  /* the whole closing block, manifest to wordmark, must fit a 13 mini
+     viewport with Safari's toolbar open (~700px) */
+  .f-count { margin: calc(20rem / var(--sr)) 0 0; }
+  .f-count-label { grid-area: 4 / 1 / 5 / 7; margin: calc(16rem / var(--sr)) 0 calc(20rem / var(--sr)); }
+  /* no fluid reveal on mobile — difference-blended white type would just
+     vanish on the white page (Safari), so plain ink here */
+  .hero .hg h1, .p-the, .p-best, .p-mid, .p-end {
+    color: var(--ink);
+    mix-blend-mode: normal;
+  }
+  .hero-meta, .hero-note, .hero-copy {
+    color: var(--ink-strong);
+    mix-blend-mode: normal;
+  }
+  .brand-cell { color: var(--ink-strong); mix-blend-mode: normal; }
+
   /* let the wordmark sit on a deliberate pause above the iOS home bar,
      not get eaten by the dynamic toolbar transition */
   .footer { padding-bottom: max(calc(12rem / var(--sr)), env(safe-area-inset-bottom)); }
@@ -559,9 +575,9 @@ sup { font-size: 0.55em; vertical-align: super; }
   .f-logo-cell { width: calc(70rem / var(--sr)); padding: calc(12rem / var(--sr)) calc(18rem / var(--sr)); }
   .f-r1 { grid-area: 5 / 3 / 6 / 7; }
   .f-r1 .f-indent { padding-left: calc(40rem / var(--sr)); }
-  .f-meta { grid-area: 6 / 1 / 7 / 7; margin-top: calc(32rem / var(--sr)); }
-  .f-badges { grid-area: 7 / 1 / 8 / 7; margin-top: calc(40rem / var(--sr)); }
-  .f-final { grid-area: 8 / 1 / 9 / 7; margin-top: calc(40rem / var(--sr)); flex-wrap: wrap; }
+  .f-meta { grid-area: 6 / 1 / 7 / 7; margin-top: calc(12rem / var(--sr)); }
+  .f-badges { grid-area: 7 / 1 / 8 / 7; margin-top: calc(16rem / var(--sr)); }
+  .f-final { grid-area: 8 / 1 / 9 / 7; margin-top: calc(16rem / var(--sr)); flex-wrap: wrap; }
   .f-final h1 { font-size: calc(56rem / var(--sr)); margin-bottom: 0; order: -1; width: 100%; text-align: center; }
 
   /* desktop spacing keeps its px size on a phone and reads twice as
@@ -572,7 +588,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .facts { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
   .facts-head { margin-bottom: calc(44rem / var(--sr)); }
   .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
-  .footer-grid { padding-top: calc(48rem / var(--sr)); }
+  .footer-grid { padding-top: calc(32rem / var(--sr)); }
   .f-badges { margin-top: calc(28rem / var(--sr)); }
   .f-final { margin-top: calc(28rem / var(--sr)); }
   /* -8rem tracking is fine at 210rem, but at phone scale it collapses
