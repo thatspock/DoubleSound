@@ -296,15 +296,17 @@ sup { font-size: 0.55em; vertical-align: super; }
 /* the second line holds its space so the bubble never jumps in height */
 .hero-note .hn-2 { visibility: hidden; transition: opacity 0.4s var(--ease-out); opacity: 0; }
 .hero-note.is-done .hn-2 { visibility: visible; opacity: 1; }
-/* a hidden ghost of the full text keeps the bubble at its final size
-   from the very first frame — nothing jumps while typing */
-.hn-1w { position: relative; display: inline-block; }
+/* grid-stack (no absolutes): ghost, live text and typing dots share one
+   cell — the ghost of the final text fixes the bubble's size, the rest
+   overlays natively */
+.hn-1w { display: inline-grid; }
+.hn-1w > * { grid-area: 1 / 1; }
 .hn-ghost { visibility: hidden; }
-.hn-1 { position: absolute; left: 0; top: 0; white-space: pre-line; }
-/* controlled, symmetric line breaks: on on mobile, off on desktop */
-br.mb { display: none; }
-.hn-dots { display: none; }
-.hero-note.is-typing .hn-dots { display: inline-block; }
+.hn-1 { white-space: pre-line; }
+/* controlled, symmetric line breaks — same four lines on every screen,
+   so the ghost and the typed text always wrap identically */
+.hn-dots { display: none; justify-self: start; align-self: start; }
+.hero-note.is-typing .hn-dots { display: flex; align-items: center; height: 1em; }
 .hn-dots span {
   display: inline-block;
   width: calc(5rem / var(--sr));
@@ -729,10 +731,9 @@ br.mb { display: none; }
     margin: 0 0 0 calc(64rem / var(--sr) + var(--pad));
   }
   .hg-name, .hg-date { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
-  /* full row on mobile — the old half-width grid cell forced the ugly
-     ragged wrapping; the ghost + mb-breaks now control the lines */
-  .hero-note { grid-area: 5 / 1 / 6 / 7; margin-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
-  br.mb { display: inline; }
+  /* two lines everywhere: names + info. Full row, off the axis — the
+     one-line name row needs the whole width on a phone */
+  .hero-note { grid-area: 5 / 1 / 6 / 7; margin-left: 0; }
   /* from under the lineup note down into the gap between "the" and
      "best", ending level with the bottoms of their letters */
   .sp-s5 {

@@ -77,10 +77,7 @@ document.querySelectorAll('[data-egg]').forEach((el) => {
 // the final text reserves it). Loops while on screen.
 const chatNote = document.querySelector('[data-chat]')
 if (chatNote) {
-  const mob = window.matchMedia('(max-width: 991px)').matches
-  const TXT = mob
-    ? 'Michael\u00A0Dop \u00B7 Basic\u00A07 \u00B7 Preesh \u00B7\nDvinskikh \u00B7 Ika'
-    : 'Michael\u00A0Dop \u00B7 Basic\u00A07 \u00B7 Preesh \u00B7 Dvinskikh \u00B7 Ika'
+  const TXT = 'Michael\u00A0Dop \u00B7 Basic\u00A07 \u00B7 Preesh \u00B7 Dvinskikh \u00B7 Ika'
   const TOKENS = TXT.match(/\S+\s*/g)
   const l1 = chatNote.querySelector('.hn-1')
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
