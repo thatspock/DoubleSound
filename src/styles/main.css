@@ -657,18 +657,24 @@ sup { font-size: 0.55em; vertical-align: super; }
      the wordmark into a smear — keep the same -3.8% of the em instead */
   .f-final h1 { letter-spacing: calc(-2rem / var(--sr)); }
 
-  /* the page rules live on mobile too — segments in the empty air
-     between blocks, reference-style, never crossing a line of type */
+  /* the page rules live on mobile too, reference-style. The hero rule
+     runs from the very top on the logo's own axis (inset from the logo =
+     the logo's inset from the screen edge), straight through the big
+     heart, with "Double Sound²" to its right; it stops at "sixteen",
+     resumes beside "one night — 28.08". */
   .spine { display: block; }
-  .sp-s2 { display: none; } /* no clean corridor for it on this layout */
-  .sp-s1 { grid-area: 1 / 3 / 2 / 4; position: relative; }
-  .sp-s1::after {
-    content: '';
-    position: absolute;
-    top: calc(100% - 1px); right: calc(var(--stroke) * -1);
-    height: calc(34vh - 2 * var(--line-gap));
-    border-right: var(--stroke) solid var(--ink-strong);
+  .sp-s1 {
+    grid-area: 1 / 1 / 3 / 3;
+    justify-self: start;
+    margin-left: calc(64rem / var(--sr) + var(--pad));
   }
+  .sp-s1::after { content: none; }
+  .sp-s2 {
+    grid-area: 4 / 1 / 5 / 3;
+    justify-self: start;
+    margin: 0 0 0 calc(64rem / var(--sr) + var(--pad));
+  }
+  .hg-name, .hg-date { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
   .sp-s3 { grid-area: 9 / 2 / 10 / 3; }
   .sp-s3::after { height: calc(104rem / var(--sr)); }
   .sp-s4 { grid-area: 7 / 2 / 8 / 3; }
