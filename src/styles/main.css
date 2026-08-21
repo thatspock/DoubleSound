@@ -8,7 +8,7 @@
   --green-2: #548a4c;
   --peach: #f2a98a;
   --cream: #f6d0ae;
-  --black: #191919;
+  --black: #262625;
   --white: #ffffff;
 
   --bg: var(--white);
@@ -209,13 +209,21 @@ sup { font-size: 0.55em; vertical-align: super; }
    up against the text blocks with an even gap, reference-style */
 .sp-s1 { grid-area: 1 / 3 / 3 / 4; }                            /* top → under "Double Sound²" */
 .sp-s2 { grid-area: 4 / 3 / 7 / 4; margin: var(--line-gap) 0; } /* "one night" → between "the | best" */
-.sp-s3 { grid-area: 9 / 3 / 10 / 4; }                           /* under "doubled." → "© '26" */
+.sp-s3 { grid-area: 9 / 3 / 10 / 4; position: relative; }       /* under "doubled." → "© '26" */
+/* ...and on across the section break, stopping a line-gap short of "Line up" */
+.sp-s3::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 1px); right: 0;
+  height: calc(128rem / var(--sr));
+  border-right: var(--stroke) solid var(--ink-strong);
+}
 
 .brand-cell {
   grid-area: 1 / 3 / 2 / 4;
-  /* white + difference: reads black on the white page, flips to white
+  /* difference against the white page = site black #262625; flips light
      wherever the dark reveal passes underneath — per-pixel, no triggers */
-  color: var(--white);
+  color: #d9d9da;
   mix-blend-mode: difference;
 }
 .brand-logo { width: calc(64rem / var(--sr)); margin-bottom: calc(10rem / var(--sr)); }
@@ -232,13 +240,14 @@ sup { font-size: 0.55em; vertical-align: super; }
 .hg { display: flex; flex-direction: column; align-items: flex-start; }
 
 /* liquid inversion: hero type over the dark reveal flips light per-pixel,
-   the part lying on white stays ink — same difference trick as the logo */
+   the part lying on white stays ink — same difference trick as the logo.
+   #d9d9da differenced against the white page = #262625, the site black */
 .hero .hg h1, .p-the, .p-best, .p-mid, .p-end {
-  color: var(--white);
+  color: #d9d9da;
   mix-blend-mode: difference;
 }
 .hero-meta, .hero-note, .hero-copy {
-  color: var(--white);
+  color: #d9d9da;
   mix-blend-mode: difference;
 }
 

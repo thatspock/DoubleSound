@@ -46,11 +46,11 @@ export function initFluidReveal({ onHeartClick } = {}) {
     c.font = `560 ${H * 0.022}px 'Inter Tight Variable', Arial, sans-serif`
     const w = c.measureText(text).width + H * 0.028
     const h = H * 0.048
-    c.fillStyle = dark ? '#191919' : '#609957'
+    c.fillStyle = dark ? '#262625' : '#609957'
     c.beginPath()
     c.roundRect(-w / 2, -h / 2, w, h, h / 2)
     c.fill()
-    c.fillStyle = dark ? '#609957' : '#191919'
+    c.fillStyle = dark ? '#609957' : '#262625'
     c.textAlign = 'center'
     c.textBaseline = 'middle'
     c.fillText(text, 0, 1)
