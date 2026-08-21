@@ -15,6 +15,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
+import { initSmoke } from './js/smoke.js'
 import { hit, initSfx, windTouch, spin } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -122,10 +123,12 @@ if (chatNote) {
   }
 }
 
-// ---------- grid overlay toggle ----------
+// ---------- smoke toggle (the grey square, desktop only) ----------
+const smoke = initSmoke()
 const gridBtn = document.querySelector('[data-grid-toggle]')
-const gridOverlay = document.querySelector('[data-grid-overlay]')
-gridBtn?.addEventListener('click', () => gridOverlay.classList.toggle('is-on'))
+if (smoke && gridBtn) {
+  gridBtn.addEventListener('click', () => gridBtn.classList.toggle('is-off', !smoke.toggle()))
+}
 
 // ---------- nav link char-roll ----------
 document.querySelectorAll('[data-roll]').forEach((el) => {

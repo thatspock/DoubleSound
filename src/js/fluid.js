@@ -77,7 +77,8 @@ export function initFluidReveal({ onHeartClick } = {}) {
     }
     drawChip(lctx, '16 YEARS', W * 0.24, H * 0.24, false, -0.08)
     drawChip(lctx, '28.08', W * 0.77, H * 0.3, false, 0.06)
-    drawChip(lctx, '×K-30', W * 0.73, H * 0.66, true, -0.05)
+    // green like the others — the dark version melted into the black video
+    drawChip(lctx, '×K-30', W * 0.73, H * 0.66, false, -0.05)
   }
 
   function resize() {
