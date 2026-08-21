@@ -102,13 +102,28 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
 // Ika = acid pluck (pentatonic). Off the glyphs, movement swells a
 // barely-there wind that fades away on its own.
 const ARTIST_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
+const TOUCH_UI = window.matchMedia('(hover: none)').matches
 document.querySelectorAll('[data-artist]').forEach((el, i) => {
   const voice = ARTIST_VOICES[i % ARTIST_VOICES.length]
+  if (TOUCH_UI) {
+    // one handler only — iOS synthesizes mouseenter on tap, which
+    // double-fired the strike and left the row stuck mid-drift
+    el.addEventListener('pointerdown', () => {
+      hit(voice)
+      el.classList.add('is-struck')
+      clearTimeout(el._struckT)
+      el._struckT = setTimeout(() => el.classList.remove('is-struck'), 450)
+      gsap.timeline()
+        .to(el, { x: '1.2vw', duration: 0.16, ease: 'power3.out' })
+        .to(el, { x: 0, duration: 0.5, ease: 'power3.out' })
+    })
+    return
+  }
   el.addEventListener('mouseenter', () => {
     hit(voice)
     gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' })
   })
-  el.addEventListener('pointerdown', () => hit(voice)) // mobile taps; throttle absorbs the desktop double
+  el.addEventListener('pointerdown', () => hit(voice))
   el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
 })
 // wind pitch = the note of whichever instrument's field the cursor is in

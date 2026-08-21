@@ -281,7 +281,10 @@ sup { font-size: 0.55em; vertical-align: super; }
   cursor: default;
   transition: color var(--dur-s) var(--ease-out);
 }
+.artist h1 { transition: color var(--dur-s) var(--ease-out); }
 @media (hover: hover) { .artist h1:hover { color: var(--green); } }
+/* tap feedback on touch — the strike flashes the name green */
+.artist.is-struck h1 { color: var(--green); }
 .a-1 { grid-column: 2 / 8; }
 .a-2 { grid-column: 3 / 9; }
 .a-3 { grid-column: 5 / 9; }
