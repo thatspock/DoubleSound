@@ -15,6 +15,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
+import { crackle } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -88,9 +89,12 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
   })
 })
 
-// ---------- artist rows: drift on hover ----------
+// ---------- artist rows: drift + crackle on hover ----------
 document.querySelectorAll('[data-artist]').forEach((el) => {
-  el.addEventListener('mouseenter', () => gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' }))
+  el.addEventListener('mouseenter', () => {
+    crackle()
+    gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' })
+  })
   el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
 })
 
