@@ -226,6 +226,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   border-right: var(--stroke) solid var(--ink-strong);
 }
 
+.sp-s5 { display: none; } /* mobile-only: lineup note → punch */
+
 .brand-cell {
   grid-area: 1 / 3 / 2 / 4;
   /* difference against the white page = site black #1f1f1e; flips light
@@ -680,7 +682,15 @@ sup { font-size: 0.55em; vertical-align: super; }
     justify-self: start;
     margin: 0 0 0 calc(64rem / var(--sr) + var(--pad));
   }
-  .hg-name, .hg-date { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
+  .hg-name, .hg-date, .hero-note { padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); }
+  /* from under the lineup note down into the gap between "the" and
+     "best", ending level with the bottoms of their letters */
+  .sp-s5 {
+    display: block;
+    grid-area: 6 / 1 / 7 / 3;
+    justify-self: start;
+    margin: var(--line-gap) 0 0 calc(64rem / var(--sr) + var(--pad));
+  }
   /* lower segments share the same logo-inset axis as the hero rule */
   .sp-s3 { grid-area: 9 / 1 / 10 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
   .sp-s3::after { height: calc(128rem / var(--sr)); }
