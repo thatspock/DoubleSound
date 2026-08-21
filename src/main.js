@@ -76,7 +76,9 @@ document.querySelectorAll('[data-egg]').forEach((el) => {
 // name, never per letter), each name striking its drum-machine voice
 const chatNote = document.querySelector('[data-chat]')
 if (chatNote) {
-  const NAMES = ['Michael Dop', ' · Basic 7', ' · Preesh', ' · Dvinskikh', ' · Ika']
+  // NBSPs pin each '·' to the name before it — lines may break only
+  // after a separator, never before it and never inside a name
+  const NAMES = ['Michael Dop', ' · Basic 7', ' · Preesh', ' · Dvinskikh', ' · Ika']
   const CHAT_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
   const l1 = chatNote.querySelector('.hn-1')
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -85,28 +87,40 @@ if (chatNote) {
     chatNote.classList.remove('is-typing')
     chatNote.classList.add('is-in', 'is-done')
   }
-  const play = () => {
-    chatNote.classList.add('is-in', 'is-typing')
-    setTimeout(() => {
-      chatNote.classList.remove('is-typing')
-      let i = 0
-      const step = () => {
-        if (i >= NAMES.length) {
-          setTimeout(() => chatNote.classList.add('is-done'), 220)
-          return
-        }
-        l1.textContent += NAMES[i]
-        hit(CHAT_VOICES[i])
-        i += 1
-        setTimeout(step, 170)
-      }
-      step()
-    }, 900)
-  }
   if (reduced) finish()
   else {
+    // the chat lives: types in, rests, then retypes — but only while
+    // it's actually on screen; off-screen it freezes fully typed
+    let alive = false
+    let idle = true
+    const cycle = () => {
+      if (!alive) { finish(); idle = true; return }
+      idle = false
+      l1.textContent = ''
+      chatNote.classList.remove('is-done')
+      chatNote.classList.add('is-in', 'is-typing')
+      setTimeout(() => {
+        if (!alive) { finish(); idle = true; return }
+        chatNote.classList.remove('is-typing')
+        let i = 0
+        const step = () => {
+          if (i >= NAMES.length) {
+            setTimeout(() => chatNote.classList.add('is-done'), 220)
+            setTimeout(cycle, 7000)
+            return
+          }
+          l1.textContent += NAMES[i]
+          hit(CHAT_VOICES[i])
+          i += 1
+          setTimeout(step, 170)
+        }
+        step()
+      }, 900)
+    }
     const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); play() }
+      const inView = entries.some((e) => e.isIntersecting)
+      alive = inView
+      if (inView && idle) cycle()
     }, { threshold: 0.6 })
     io.observe(chatNote)
   }

@@ -683,7 +683,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   /* desktop spacing keeps its px size on a phone and reads twice as
      heavy — compress the vertical rhythm across all sections */
   .lineup { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
-  .facts { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
+  .facts { padding: calc(100rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
   .facts-head { margin-bottom: calc(44rem / var(--sr)); }
   .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
   /* the entire footer — manifest, timer, wordmark — is one phone screen */
@@ -744,7 +744,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .sp-s3::after { height: calc(128rem / var(--sr)); }
   .sp-s4 { grid-area: 7 / 1 / 8 / 3; justify-self: start; margin-left: calc(64rem / var(--sr) + var(--pad)); }
   /* fill the Ika->Facts corridor, one line-gap short of each block */
-  .sp-s4::after { top: var(--line-gap); height: calc(80rem / var(--sr)); }
+  .sp-s4::after { top: var(--line-gap); height: calc(104rem / var(--sr)); }
 
   .sticky-name, .scrollbar { display: none; }
 }
