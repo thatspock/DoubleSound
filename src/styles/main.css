@@ -286,6 +286,16 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 /* ---------------- lineup ---------------- */
 .lineup { padding: calc(140rem / var(--sr)) var(--pad) calc(120rem / var(--sr)); }
+/* rule segment carrying the eye from Ika down to Facts; spans the
+   lineup/facts padding gap (120 + 120), a line-gap short of each */
+.sp-s4 { grid-area: 6 / 3 / 7 / 4; height: 0; border: none; position: relative; }
+.sp-s4::after {
+  content: '';
+  position: absolute;
+  top: var(--line-gap); right: 0;
+  height: calc(184rem / var(--sr));
+  border-right: var(--stroke) solid var(--ink-strong);
+}
 .lineup-head { margin-bottom: calc(90rem / var(--sr)); }
 .lh-a { grid-column: 3 / 6; }
 .lh-b { grid-column: 6 / 8; }

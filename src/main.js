@@ -194,6 +194,10 @@ initFluidReveal({ onHeartClick: dropIka })
 document.querySelector('.heart-static')?.addEventListener('click', (e) => dropIka(e.clientX))
 
 runPreloader().then(() => {
+  // belt and braces: whatever restored the position while the preloader
+  // covered the screen, the site opens from the very top
+  lenis.scrollTo(0, { immediate: true, force: true })
+  window.scrollTo(0, 0)
   lenis.start()
   ScrollTrigger.refresh()
   playUnreachableGoo()

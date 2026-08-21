@@ -96,6 +96,13 @@ function spawn(src, x0, y0, opts = {}) {
   }
   heads.push(head)
 
+  // a fresh body must not steal the very next click from the row it
+  // popped out of — it turns grabbable only after a short grace period
+  if (!TOUCH && opts.graceMs) {
+    el.style.pointerEvents = 'none'
+    setTimeout(() => { if (!head.phantom) el.style.pointerEvents = 'auto' }, opts.graceMs)
+  }
+
   el.addEventListener('pointerdown', (e) => {
     if (head.phantom) return
     e.preventDefault()
@@ -126,12 +133,16 @@ export function dropIka(clickX) {
   spawn('/assets/head-ika.webp', clickX, undefined, { ar: AR_IKA })
 }
 
-// facts-row eggs pop out of the clicked row, then fall like everything else
+// facts-row eggs pop out of the clicked row, then fall like everything
+// else. They eject SIDEWAYS from the click point so rapid clicking keeps
+// working — the cursor stays over the row, the catch happens next to it.
 export function dropEgg(src, x, y) {
-  spawn(src, x, y, {
+  const side = Math.random() < 0.5 ? -1 : 1
+  spawn(src, x + side * (70 + Math.random() * 130), y, {
     scale: 0.72,
-    vx: (Math.random() - 0.5) * 240,
+    vx: side * (120 + Math.random() * 180),
     vy: -(420 + Math.random() * 260),
+    graceMs: 500,
   })
 }
 
