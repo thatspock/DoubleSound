@@ -2,6 +2,13 @@
   "name": "doublesound",
   "private": true,
   "version": "1.0.0",
+  "description": "One-night party site for Double Sound² × K-30: canvas fluid reveal, a lineup you can play like a drum machine, Web Audio synthesis",
+  "license": "MIT",
+  "homepage": "https://doublesound.live",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thatspock/DoubleSound.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

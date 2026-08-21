@@ -14,6 +14,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
+import { initAnalytics } from './js/analytics.js'
 import { hit, initSfx, windTouch, spin } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -285,6 +286,7 @@ gsap.to('[data-reveal-wrap]', {
 
 // ---------- boot ----------
 bootLog()
+initAnalytics()
 initSfx()
 initAudio()
 initCountdown()
