@@ -15,7 +15,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
-import { crackle, initSfx } from './js/sfx.js'
+import { hit, initSfx } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -89,13 +89,17 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
   })
 })
 
-// ---------- artist rows: drift + crackle on hover/tap ----------
-document.querySelectorAll('[data-artist]').forEach((el) => {
+// ---------- artist rows: each one is a drum-machine voice ----------
+// Michael Dop = kick · Basic 7 = bass · Preesh = clap · Dvinskikh = hat ·
+// Ika = acid pluck (pentatonic) — sweep the lineup, play minimal techno
+const ARTIST_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
+document.querySelectorAll('[data-artist]').forEach((el, i) => {
+  const voice = ARTIST_VOICES[i % ARTIST_VOICES.length]
   el.addEventListener('mouseenter', () => {
-    crackle()
+    hit(voice)
     gsap.to(el, { x: '1.2vw', duration: 0.5, ease: 'power3.out' })
   })
-  el.addEventListener('pointerdown', crackle) // mobile taps; hover throttle absorbs the desktop double
+  el.addEventListener('pointerdown', () => hit(voice)) // mobile taps; throttle absorbs the desktop double
   el.addEventListener('mouseleave', () => gsap.to(el, { x: 0, duration: 0.5, ease: 'power3.out' }))
 })
 
