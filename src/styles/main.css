@@ -9,7 +9,7 @@
   --peach: #f2a98a;
   --cream: #f6d0ae;
   --black: #1f1f1e;
-  --white: #fafaf7;
+  --white: #f0f0eb;
 
   --bg: var(--white);
   --bg-2: #f4f4f4;
@@ -147,7 +147,7 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 /* the dark reveal has swallowed the pills' corner — flip to light */
 .nav.is-inverted .nav-cta,
-.nav.is-inverted .nav-sound { background: #dbdbd9; color: var(--green-2); }
+.nav.is-inverted .nav-sound { background: #d1d1cd; color: var(--green-2); }
 
 .nav-sound {
   pointer-events: auto;
@@ -229,7 +229,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   grid-area: 1 / 3 / 2 / 4;
   /* difference against the white page = site black #1f1f1e; flips light
      wherever the dark reveal passes underneath — per-pixel, no triggers */
-  color: #dbdbd9;
+  color: #d1d1cd;
   mix-blend-mode: difference;
 }
 .brand-logo { width: calc(64rem / var(--sr)); margin-bottom: calc(10rem / var(--sr)); }
@@ -247,13 +247,13 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 /* liquid inversion: hero type over the dark reveal flips light per-pixel,
    the part lying on white stays ink — same difference trick as the logo.
-   #dbdbd9 differenced against the white page = #1f1f1e, the site black */
+   #d1d1cd differenced against the white page = #1f1f1e, the site black */
 .hero .hg h1, .p-the, .p-best, .p-mid, .p-end {
-  color: #dbdbd9;
+  color: #d1d1cd;
   mix-blend-mode: difference;
 }
 .hero-meta, .hero-note, .hero-copy {
-  color: #dbdbd9;
+  color: #d1d1cd;
   mix-blend-mode: difference;
 }
 
