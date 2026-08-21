@@ -266,6 +266,9 @@ sup { font-size: 0.55em; vertical-align: super; }
   color: #d1d1cd;
   mix-blend-mode: difference;
 }
+/* the small lineup note reads softer: #b0b0ad differenced against the
+   paper = #40403e */
+.hero-note { color: #b0b0ad; }
 
 /* the whole message — name, sixteen years ×K-30, one night 28.08 —
    must finish inside the first viewport; the fluid stage lives beneath it */
@@ -623,6 +626,7 @@ sup { font-size: 0.55em; vertical-align: super; }
     color: var(--ink-strong);
     mix-blend-mode: normal;
   }
+  .hero-note { color: #40403e; }
   .brand-cell { color: var(--ink-strong); mix-blend-mode: normal; }
 
   /* let the wordmark sit on a deliberate pause above the iOS home bar,
