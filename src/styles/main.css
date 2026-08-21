@@ -771,4 +771,6 @@ sup { font-size: 0.55em; vertical-align: super; }
   html { font-size: min(1vw, 7.2px); }
   .heart-static { width: 52vw; top: 30%; }
   .hg-name { margin-top: 36svh; }
+  /* keep the meta clear of the fixed nav pills */
+  .hero-meta { padding-right: calc(100rem / var(--sr)); }
 }
