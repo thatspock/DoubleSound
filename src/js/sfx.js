@@ -1,6 +1,8 @@
-// The lineup is a drum machine: every artist hovers/taps a different
-// minimal-techno voice, all tuned around A minor so sweeping between
-// names always sounds musical. A faint vinyl crackle rides on top of
+// The lineup is a drum machine where every voice is PLAYABLE: each artist
+// taps a different minimal-techno instrument, and every instrument walks
+// the A-minor pentatonic (shared melody engine below) — so hammering one
+// name in any rhythm plays music, the Ika trick generalized to the whole
+// lineup. Dry, deep, no reverb; a faint vinyl crackle rides on top of
 // every hit to keep the glitch texture. Synthesized in Web Audio, no
 // samples; the first gesture anywhere unlocks the context.
 let ctx = null
@@ -104,46 +106,138 @@ function env(t, peak, dur) {
   return g
 }
 
+// ── melody engine (screen 2026-08-21: every name must PLAY like Ika) ────────
+// One shared musical brain so any voice tapped in any rhythm comes out as
+// music, not dice: notes walk the A-minor pentatonic with a pull back to
+// the root (lines, not jumps), and the gap since the previous tap becomes
+// the groove — fast rolls tighten and quieten each hit, spaced taps breathe.
+
+const PENT = [0, 3, 5, 7, 10] // A minor pentatonic, semitones from A
+function pentHz(base, deg) {
+  const oct = Math.floor(deg / 5)
+  const step = PENT[((deg % 5) + 5) % 5]
+  return base * Math.pow(2, (step + 12 * oct) / 12)
+}
+
+const walks = {}
+function walkDeg(kind, lo, hi) {
+  const w = walks[kind] ?? (walks[kind] = { pos: 0 })
+  let step = [-2, -1, -1, 1, 1, 2][Math.floor(Math.random() * 6)]
+  // gravity toward the root: far from home, odds tilt back down the lattice
+  if (w.pos !== 0 && Math.random() < 0.3) step = -Math.sign(w.pos) * Math.abs(step)
+  w.pos = Math.max(lo, Math.min(hi, w.pos + step))
+  return w.pos
+}
+
+const lastTap = {}
+function groove(kind) {
+  const now = performance.now()
+  const gap = now - (lastTap[kind] ?? 0)
+  lastTap[kind] = now
+  return Math.max(0, Math.min(1, (gap - 90) / 480)) // 0 = fast roll · 1 = spaced
+}
+
+// dry minor-chord cycle for the stab voice: i → VI → III → VII — a steady
+// tap rhythm harmonises itself (semitones relative to A)
+const STAB_CHORDS = [[0, 3, 7], [-4, 0, 3], [3, 7, 10], [-2, 2, 5]]
+let stabStep = 0
+
 const VOICES = {
   crackle() {}, // bare tick: the crackle layer alone
+
+  // Michael Dop — tuned sub-kick: the transient stays a kick, the tail
+  // SINGS a low pentatonic note; rolling taps play a deep 808-ish bassline
   kick(t) {
+    const a = groove('kick')
+    const f = pentHz(55, walkDeg('kick', 0, 5)) // A1 … ~G2
     const o = ctx.createOscillator()
     o.type = 'sine'
-    o.frequency.setValueAtTime(160, t)
-    o.frequency.exponentialRampToValueAtTime(44, t + 0.11)
-    const g = env(t, 1.0, 0.26)
+    o.frequency.setValueAtTime(f * 4.2, t)
+    o.frequency.exponentialRampToValueAtTime(f, t + 0.05)
+    const g = env(t, 0.8 + 0.15 * a, 0.28 + 0.22 * a)
     o.connect(g).connect(master)
-    o.start(t); o.stop(t + 0.28)
-    const click = noiseSrc(0.012)
-    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000
-    click.connect(hp).connect(env(t, 0.25, 0.012)).connect(master)
-    click.start(t); click.stop(t + 0.012)
+    o.start(t); o.stop(t + 0.55)
+    const click = noiseSrc(0.01)
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3200
+    click.connect(hp).connect(env(t, 0.16, 0.01)).connect(master)
+    click.start(t); click.stop(t + 0.01)
   },
+
+  // Basic 7 — rolling acid bass: every tap a walked note through a biting
+  // resonant lowpass; spaced taps open the filter (accent), rolls stay tight
   bass(t) {
+    const a = groove('bass')
+    const f = pentHz(55, walkDeg('bass', 0, 9)) // A1 … ~C3
     const o = ctx.createOscillator()
     o.type = 'sawtooth'
-    o.frequency.value = 110 // A2
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 6
-    lp.frequency.setValueAtTime(900, t)
-    lp.frequency.exponentialRampToValueAtTime(140, t + 0.22)
-    const g = env(t, 0.55, 0.26)
-    o.connect(lp).connect(g).connect(master)
-    o.start(t); o.stop(t + 0.28)
+    o.frequency.value = f
+    const sub = ctx.createOscillator()
+    sub.type = 'square'
+    sub.frequency.value = f / 2
+    const subG = ctx.createGain(); subG.gain.value = 0.25
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 9
+    lp.frequency.setValueAtTime(340 + 1100 * a, t)
+    lp.frequency.exponentialRampToValueAtTime(130, t + 0.14 + 0.1 * a)
+    const g = env(t, 0.5, 0.16 + 0.12 * a)
+    o.connect(lp)
+    sub.connect(subG).connect(lp)
+    lp.connect(g).connect(master)
+    o.start(t); o.stop(t + 0.32)
+    sub.start(t); sub.stop(t + 0.32)
   },
+
+  // Preesh — dry minimal stab: the clap snap rides on top, a dark minor
+  // chord fires underneath; the chord cycles i→VI→III→VII every other tap,
+  // so a steady rhythm walks its own progression
   clap(t) {
-    for (const [off, peak, dur] of [[0, 0.5, 0.03], [0.013, 0.45, 0.03], [0.027, 0.55, 0.16]]) {
+    const a = groove('clap')
+    for (const [off, peak, dur] of [[0, 0.3, 0.025], [0.012, 0.26, 0.025], [0.024, 0.34, 0.1]]) {
       const n = noiseSrc(dur)
       const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'
-      bp.frequency.value = 1150; bp.Q.value = 0.9
+      bp.frequency.value = 1300; bp.Q.value = 1.1
       n.connect(bp).connect(env(t + off, peak, dur)).connect(master)
       n.start(t + off); n.stop(t + off + dur)
     }
+    stabStep += Math.random() < 0.5 ? 1 : 0
+    const chord = STAB_CHORDS[stabStep % STAB_CHORDS.length]
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'
+    lp.frequency.value = 850 + 500 * a
+    const g = env(t, 0.34, 0.16 + 0.1 * a)
+    for (const semi of chord) {
+      for (const det of [1, 1.004]) {
+        const o = ctx.createOscillator()
+        o.type = 'sawtooth'
+        o.frequency.value = 220 * Math.pow(2, semi / 12) * det
+        o.connect(lp)
+        o.start(t); o.stop(t + 0.3)
+      }
+    }
+    lp.connect(g).connect(master)
   },
+
+  // Dvinskikh — glass perc: the hat keeps its air, but an FM ping walks a
+  // high pentatonic line under it; fast taps sparkle dry, spaced taps ring
   hat(t) {
-    const n = noiseSrc(0.05)
-    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7800
-    n.connect(hp).connect(env(t, 0.4, 0.045)).connect(master)
-    n.start(t); n.stop(t + 0.05)
+    const a = groove('hat')
+    const n = noiseSrc(0.035)
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 8200
+    n.connect(hp).connect(env(t, 0.28, 0.032)).connect(master)
+    n.start(t); n.stop(t + 0.035)
+    const f = pentHz(880, walkDeg('hat', 0, 7)) // A5 … ~A6
+    const car = ctx.createOscillator()
+    car.type = 'sine'
+    car.frequency.value = f
+    const mod = ctx.createOscillator()
+    mod.type = 'sine'
+    mod.frequency.value = f * 3.01 // inharmonic-ish → glassy, not organ
+    const mg = ctx.createGain()
+    mg.gain.setValueAtTime(f * 1.4, t)
+    mg.gain.exponentialRampToValueAtTime(f * 0.1, t + 0.06)
+    mod.connect(mg).connect(car.frequency)
+    const g = env(t, 0.16, 0.05 + 0.14 * a)
+    car.connect(g).connect(master)
+    car.start(t); car.stop(t + 0.25)
+    mod.start(t); mod.stop(t + 0.25)
   },
   pluck(t) {
     // rominimal guitar: a muted low string (Karplus–Strong, softened

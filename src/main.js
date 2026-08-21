@@ -157,9 +157,11 @@ document.querySelectorAll('[data-roll]').forEach((el) => {
 })
 
 // ---------- lineup: the words strike, the empty air breathes ----------
-// Michael Dop = kick · Basic 7 = bass · Preesh = clap · Dvinskikh = hat ·
-// Ika = acid pluck (pentatonic). Off the glyphs, movement swells a
-// barely-there wind that fades away on its own.
+// Every name is a playable instrument on the shared A-minor pentatonic
+// (sfx.js melody engine): Michael Dop = singing sub-kick · Basic 7 =
+// rolling acid bass · Preesh = dry chord stab · Dvinskikh = glass perc ·
+// Ika = acid pluck. Off the glyphs, movement swells a barely-there wind
+// that fades away on its own.
 const ARTIST_VOICES = ['kick', 'bass', 'clap', 'hat', 'pluck']
 const TOUCH_UI = window.matchMedia('(hover: none)').matches
 // scrolling must stay silent: rows sliding under a parked cursor fire
