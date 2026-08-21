@@ -103,7 +103,7 @@ if (chatNote) {
         const step = () => {
           if (i >= TOKENS.length) {
             setTimeout(() => chatNote.classList.add('is-done'), 200)
-            setTimeout(cycle, 7000)
+            setTimeout(cycle, 3500)
             return
           }
           l1.textContent += TOKENS[i]
