@@ -201,3 +201,39 @@ export function hit(kind) {
 export function crackle() {
   hit('crackle')
 }
+
+// the spinning heart tile: a dry deep-tech riser — a resonant blip
+// gliding upward; consecutive clicks (momentum) push the glide higher,
+// like something spinning up. Quiet by design.
+export function spin(momentum = 1) {
+  if (!ctx || ctx.state !== 'running') {
+    pending = { kind: 'crackle', ts: performance.now() }
+    return
+  }
+  const t = ctx.currentTime
+  const m = Math.min(momentum, 6)
+  const o = ctx.createOscillator()
+  o.type = 'triangle'
+  o.frequency.setValueAtTime(70, t)
+  o.frequency.exponentialRampToValueAtTime(140 + m * 90, t + 0.22)
+  const lp = ctx.createBiquadFilter()
+  lp.type = 'lowpass'
+  lp.Q.value = 9
+  lp.frequency.setValueAtTime(320, t)
+  lp.frequency.exponentialRampToValueAtTime(700 + m * 350, t + 0.22)
+  const g = env(t, 0.22, 0.3)
+  o.connect(lp)
+  lp.connect(g)
+  g.connect(master)
+  o.start(t)
+  o.stop(t + 0.32)
+  // dry tick at the flick of the wrist
+  const c = ctx.createOscillator()
+  c.type = 'square'
+  c.frequency.value = 1200 + m * 300
+  const cg = env(t, 0.06, 0.01)
+  c.connect(cg)
+  cg.connect(master)
+  c.start(t)
+  c.stop(t + 0.012)
+}

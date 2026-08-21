@@ -15,7 +15,7 @@ import { dropIka, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
-import { hit, initSfx, windTouch } from './js/sfx.js'
+import { hit, initSfx, windTouch, spin } from './js/sfx.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -41,11 +41,16 @@ new ResizeObserver(() => {
 // ---------- heart silhouettes ----------
 document.querySelectorAll('[data-heart-path]').forEach((p) => p.setAttribute('d', HEART_D))
 
-// spin totems on click
+// spin totems on click — consecutive clicks wind the riser sound higher
 document.querySelectorAll('[data-heart-spin]').forEach((el) => {
   let turns = 0
+  let clicks = []
   el.addEventListener('click', () => {
     turns += 1
+    const now = performance.now()
+    clicks = clicks.filter((ts) => now - ts < 1600)
+    clicks.push(now)
+    spin(clicks.length)
     gsap.to(el, { rotation: turns * 360, duration: 1.4, ease: 'elastic.out(1, 0.6)' })
   })
 })
