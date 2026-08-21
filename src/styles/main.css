@@ -364,7 +364,11 @@ sup { font-size: 0.55em; vertical-align: super; }
 .tickets-note { color: var(--ink-strong); }
 
 /* ---------------- footer ---------------- */
-.footer { padding: calc(40rem / var(--sr)) var(--pad) calc(6rem / var(--sr)); overflow: clip; }
+.footer {
+  --footer-pad-b: calc(6rem / var(--sr));
+  padding: calc(40rem / var(--sr)) var(--pad) var(--footer-pad-b);
+  overflow: clip;
+}
 .footer-grid {
   border-top: var(--stroke) solid var(--ink-strong);
   padding-top: calc(90rem / var(--sr));
@@ -376,9 +380,9 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 /* countdown spread edge-to-edge like the reference time row */
 .f-count {
-  grid-area: 3 / 1 / 4 / 9;
+  grid-area: 1 / 1 / 2 / 9;
   display: flex; align-items: center; justify-content: space-between;
-  margin: calc(104rem / var(--sr)) 0 0;
+  margin: calc(24rem / var(--sr)) 0 0;
 }
 /* the label hangs below, out of flow — the row centre-aligns on the
    DIGITS, so every colon sits on the same optical line */
@@ -387,10 +391,19 @@ sup { font-size: 0.55em; vertical-align: super; }
   position: absolute; top: calc(100% + 8rem / var(--sr)); left: 50%;
   transform: translateX(-50%);
 }
-/* the closing block — countdown down to the wordmark — must assemble
-   inside one desktop viewport, so these gaps stay tight */
+/* the closing block is exactly one viewport tall: the timer sits flush
+   on the top edge at full scroll, the wordmark on the bottom, and all
+   flexible air collects around "left to go." in the middle */
+.f-closing {
+  grid-area: 3 / 1 / 4 / 9;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-column-gap: var(--gap);
+  grid-template-rows: auto auto 1fr auto auto;
+  min-height: calc(100svh - var(--footer-pad-b));
+}
 .f-count-label {
-  grid-area: 4 / 1 / 5 / 9;
+  grid-area: 2 / 1 / 3 / 9;
   justify-self: center;
   margin: calc(32rem / var(--sr)) 0 calc(40rem / var(--sr));
   color: var(--ink-strong);
@@ -409,19 +422,19 @@ sup { font-size: 0.55em; vertical-align: super; }
 }
 .f-logo-cell svg { width: 100%; height: auto; display: block; }
 
-.f-r1 { grid-area: 5 / 5 / 6 / 9; }
+.f-r1 { grid-area: 3 / 5 / 4 / 9; align-self: center; }
 .f-r1 .f-indent { padding-left: calc(90rem / var(--sr)); }
 
 .f-meta {
-  grid-area: 5 / 3 / 6 / 5;
+  grid-area: 3 / 3 / 4 / 5;
   display: flex; flex-direction: column;
   gap: calc(6rem / var(--sr));
   color: var(--ink-strong);
-  margin-top: calc(12rem / var(--sr));
+  align-self: center;
 }
 
 .f-badges {
-  grid-area: 6 / 3 / 7 / 7;
+  grid-area: 4 / 3 / 5 / 7;
   display: flex; gap: calc(8rem / var(--sr));
   justify-content: center;
   margin-top: calc(24rem / var(--sr));
@@ -440,7 +453,7 @@ sup { font-size: 0.55em; vertical-align: super; }
 
 /* closing row: giant wordmark cropped by the page edge, meta in the corners */
 .f-final {
-  grid-area: 7 / 1 / 8 / 9;
+  grid-area: 5 / 1 / 6 / 9;
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: calc(24rem / var(--sr));
   margin-top: calc(24rem / var(--sr));
@@ -553,10 +566,13 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   .f-l1 { grid-area: 1 / 1 / 2 / 7; }
   .f-l2 { grid-area: 2 / 1 / 3 / 7; }
-  /* the whole closing block, manifest to wordmark, must fit a 13 mini
-     viewport with Safari's toolbar open (~700px) */
-  .f-count { margin: calc(20rem / var(--sr)) 0 0; }
-  .f-count-label { grid-area: 4 / 1 / 5 / 7; margin: calc(16rem / var(--sr)) 0 calc(20rem / var(--sr)); }
+  /* closing block = one mobile viewport; six rows, meta gets its own */
+  .f-closing {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: auto auto 1fr auto auto auto;
+  }
+  .f-count { margin: calc(76rem / var(--sr)) 0 0; } /* clear the fixed nav pills */
+  .f-count-label { grid-area: 2 / 1 / 3 / 7; margin: calc(16rem / var(--sr)) 0 calc(20rem / var(--sr)); }
   /* no fluid reveal on mobile — difference-blended white type would just
      vanish on the white page (Safari), so plain ink here */
   .hero .hg h1, .p-the, .p-best, .p-mid, .p-end {
@@ -571,7 +587,7 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   /* let the wordmark sit on a deliberate pause above the iOS home bar,
      not get eaten by the dynamic toolbar transition */
-  .footer { padding-bottom: max(calc(12rem / var(--sr)), env(safe-area-inset-bottom)); }
+  .footer { --footer-pad-b: max(calc(12rem / var(--sr)), env(safe-area-inset-bottom)); }
 
   /* the giant counter overflows a phone screen at desktop size */
   .pre-count { font-size: calc(96rem / var(--sr)); }
@@ -579,11 +595,11 @@ sup { font-size: 0.55em; vertical-align: super; }
   .hero-copy { margin-top: calc(32rem / var(--sr)); }
   .lineup { padding-top: calc(56rem / var(--sr)); }
   .f-logo-cell { width: calc(70rem / var(--sr)); padding: calc(12rem / var(--sr)) calc(18rem / var(--sr)); }
-  .f-r1 { grid-area: 5 / 3 / 6 / 7; }
+  .f-r1 { grid-area: 3 / 3 / 4 / 7; }
   .f-r1 .f-indent { padding-left: calc(40rem / var(--sr)); }
-  .f-meta { grid-area: 6 / 1 / 7 / 7; margin-top: calc(12rem / var(--sr)); }
-  .f-badges { grid-area: 7 / 1 / 8 / 7; margin-top: calc(16rem / var(--sr)); }
-  .f-final { grid-area: 8 / 1 / 9 / 7; margin-top: calc(16rem / var(--sr)); flex-wrap: wrap; }
+  .f-meta { grid-area: 4 / 1 / 5 / 7; margin-top: calc(12rem / var(--sr)); align-self: start; }
+  .f-badges { grid-area: 5 / 1 / 6 / 7; margin-top: calc(16rem / var(--sr)); }
+  .f-final { grid-area: 6 / 1 / 7 / 7; margin-top: calc(16rem / var(--sr)); flex-wrap: wrap; }
   .f-final h1 { font-size: calc(56rem / var(--sr)); margin-bottom: 0; order: -1; width: 100%; text-align: center; }
 
   /* desktop spacing keeps its px size on a phone and reads twice as

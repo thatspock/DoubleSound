@@ -32,7 +32,9 @@ let pending = null // the strike that arrived while the context was waking
 export function initSfx() {
   const unlock = () => {
     ensure()
-    if (!keepAlive && window.matchMedia('(hover: none)').matches) {
+    // second wake-up channel on every platform: a playing HTMLAudio is
+    // exactly what makes the nav toggle "work", so lean on it too
+    if (!keepAlive) {
       keepAlive = new Audio(SILENT_WAV)
       keepAlive.loop = true
       keepAlive.volume = 0.01
@@ -41,9 +43,10 @@ export function initSfx() {
     ctx.resume().then(() => {
       if (ctx.state !== 'running') return
       UNLOCK_EVENTS.forEach((e) => document.removeEventListener(e, unlock, true))
+      console.log('%c[sfx] audio unlocked — the lineup is live', 'color:#609957')
       if (pending && performance.now() - pending.ts < 600) playHit(pending.kind)
       pending = null
-    }).catch(() => {})
+    }).catch((err) => console.log('[sfx] resume failed:', err?.message))
   }
   UNLOCK_EVENTS.forEach((e) => document.addEventListener(e, unlock, true))
 }
