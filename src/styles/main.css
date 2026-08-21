@@ -587,7 +587,9 @@ sup { font-size: 0.55em; vertical-align: super; }
   .brand-cell { grid-area: 1 / 1 / 2 / 3; }
   .hero-meta { grid-area: 1 / 3 / 2 / 7; padding-right: calc(64rem / var(--sr)); }
   /* start right below the floating heart so the full message fits the fold */
-  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 36svh; }
+  /* the name slides UNDER the stone: same negative-z trick as the rule;
+     only the cap-tops hide, the letter bodies stay readable */
+  .hg-name { grid-area: 2 / 1 / 3 / 7; margin-top: 34svh; z-index: -1; }
   .hg-years { margin-top: calc(18rem / var(--sr)); }
   .hg-date { margin-top: calc(10rem / var(--sr)); }
   .hg-years { grid-area: 3 / 1 / 4 / 7; }
