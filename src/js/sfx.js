@@ -194,32 +194,102 @@ function ensurePluckEcho() {
 // barely-there wind for the empty air between the names: movement swells
 // it in softly, stillness lets it fade out on its own
 let wind = null
+
+// pink noise — smoother and more "analog" than white (Paul Kellet's filter)
+function pinkBuf(dur) {
+  const sr = ctx.sampleRate
+  const buf = ctx.createBuffer(1, Math.ceil(sr * dur), sr)
+  const d = buf.getChannelData(0)
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0
+  for (let i = 0; i < d.length; i++) {
+    const w = Math.random() * 2 - 1
+    b0 = 0.99886 * b0 + w * 0.0555179
+    b1 = 0.99332 * b1 + w * 0.0750759
+    b2 = 0.969 * b2 + w * 0.153852
+    b3 = 0.8665 * b3 + w * 0.3104856
+    b4 = 0.55 * b4 + w * 0.5329522
+    b5 = -0.7616 * b5 - w * 0.016898
+    d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11
+    b6 = w * 0.115926
+  }
+  return buf
+}
+
+// sparse organic ticks — the bark grain
+function barkBuf(dur) {
+  const sr = ctx.sampleRate
+  const buf = ctx.createBuffer(1, Math.ceil(sr * dur), sr)
+  const d = buf.getChannelData(0)
+  for (let n = 0; n < 46; n++) {
+    const pos = Math.floor(Math.random() * (d.length - 400))
+    const len = 40 + Math.floor(Math.random() * 280)
+    const amp = 0.3 + Math.random() * 0.7
+    for (let j = 0; j < len; j++) {
+      d[pos + j] += amp * (Math.random() * 2 - 1) * Math.exp(-(j / len) * 6)
+    }
+  }
+  return buf
+}
+
 function ensureWind() {
   if (wind) return
-  const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate)
-  const d = buf.getChannelData(0)
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
-  const src = ctx.createBufferSource()
-  src.buffer = buf
-  src.loop = true
+  const g = ctx.createGain()
+  g.gain.value = 0
+  const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null
+
+  // body: pink noise breathing through the zone's note
+  const body = ctx.createBufferSource()
+  body.buffer = pinkBuf(4)
+  body.loop = true
+  const hp = ctx.createBiquadFilter()
+  hp.type = 'highpass'
+  hp.frequency.value = 180
   const bp = ctx.createBiquadFilter()
   bp.type = 'bandpass'
   bp.frequency.value = 620
-  bp.Q.value = 0.6
-  const g = ctx.createGain()
-  g.gain.value = 0
-  // slow LFO on the filter — the howl
+  bp.Q.value = 0.9
+  body.connect(hp); hp.connect(bp); bp.connect(g)
+
+  // air: a silky high sliver of the same pink
+  const air = ctx.createBufferSource()
+  air.buffer = pinkBuf(3.1)
+  air.loop = true
+  const airHp = ctx.createBiquadFilter()
+  airHp.type = 'highpass'
+  airHp.frequency.value = 5600
+  const airG = ctx.createGain()
+  airG.gain.value = 0.5
+  air.connect(airHp); airHp.connect(airG); airG.connect(g)
+
+  // bark: sparse warm ticks riding the same swell
+  const bark = ctx.createBufferSource()
+  bark.buffer = barkBuf(5)
+  bark.loop = true
+  const barkLp = ctx.createBiquadFilter()
+  barkLp.type = 'lowpass'
+  barkLp.frequency.value = 2100
+  const barkG = ctx.createGain()
+  barkG.gain.value = 0.6
+  bark.connect(barkLp); barkLp.connect(barkG); barkG.connect(g)
+
+  // slow drifts: filter sway around the note + wandering stereo position
   const lfo = ctx.createOscillator()
-  lfo.frequency.value = 0.17
+  lfo.frequency.value = 0.11
   const lfoAmp = ctx.createGain()
-  lfoAmp.gain.value = 90 // sway around the zone's note without leaving it
-  lfo.connect(lfoAmp)
-  lfoAmp.connect(bp.frequency)
-  src.connect(bp)
-  bp.connect(g)
-  g.connect(master)
-  src.start()
-  lfo.start()
+  lfoAmp.gain.value = 70
+  lfo.connect(lfoAmp); lfoAmp.connect(bp.frequency)
+  if (pan) {
+    const drift = ctx.createOscillator()
+    drift.frequency.value = 0.047
+    const driftAmp = ctx.createGain()
+    driftAmp.gain.value = 0.55
+    drift.connect(driftAmp); driftAmp.connect(pan.pan)
+    g.connect(pan); pan.connect(master)
+    drift.start()
+  } else {
+    g.connect(master)
+  }
+  body.start(); air.start(); bark.start(); lfo.start()
   wind = { g, bp }
 }
 
@@ -232,8 +302,8 @@ export function windTouch(freq = 620) {
   wind.bp.frequency.setTargetAtTime(freq, t, 0.25)
   const g = wind.g.gain
   g.cancelScheduledValues(t)
-  g.setTargetAtTime(0.028, t, 0.3)     // swell in while the cursor moves
-  g.setTargetAtTime(0, t + 0.35, 0.9)  // and die down once it stops
+  g.setTargetAtTime(0.04, t, 0.45)     // swell in while the cursor moves
+  g.setTargetAtTime(0, t + 0.4, 1.4)  // and die down once it stops
 }
 
 function crackleLayer(t) {
