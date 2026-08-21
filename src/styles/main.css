@@ -638,7 +638,7 @@ sup { font-size: 0.55em; vertical-align: super; }
      at 64rem + pad, the text a line-gap's breath to its right */
   /* line 1 rides level with the pills; the wider address line clears
      their bottom edge before it crosses their column */
-  .hero-meta { grid-area: 1 / 1 / 2 / 7; margin-top: 0; padding-right: 0; padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); gap: calc(12rem / var(--sr)); }
+  .hero-meta { grid-area: 1 / 1 / 2 / 7; margin-top: 0; padding-right: 0; padding-left: calc(64rem / var(--sr) + var(--pad) + 14rem / var(--sr)); gap: calc(8rem / var(--sr)); }
   .hero-meta .p1 { font-size: calc(11rem / var(--sr)); }
   /* start right below the floating heart so the full message fits the fold */
   /* the name slides UNDER the stone: same negative-z trick as the rule;
@@ -791,10 +791,10 @@ sup { font-size: 0.55em; vertical-align: super; }
   /* start one column earlier + clear the fixed nav pills: the address
      must fit exactly two lines, top-flush */
   /* same anchor as phones: text sits a line-gap right of the spine */
-  .hero-meta { grid-area: 1 / 1 / 2 / 7; padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); padding-right: calc(90rem / var(--sr)); margin-top: 0; }
+  .hero-meta { grid-area: 1 / 1 / 2 / 7; padding-left: calc(64rem / var(--sr) + var(--pad) + var(--line-gap)); padding-right: calc(90rem / var(--sr)); margin-top: 0; gap: calc(4rem / var(--sr)); }
   /* closing manifest: full-size type overran the viewport top on minis */
   .f-l1 h1, .f-l2 h1 { font-size: calc(64rem / var(--sr)); }
-  .hero-meta .p1 { font-size: calc(11rem / var(--sr)); }
+  .hero-meta .p1 { font-size: calc(9.5rem / var(--sr)); }
 }
 /* tall-but-short tablets (iPad mini portrait): the same stack is a touch
    too tall for the 1024px fold — let the height cap the scale */
