@@ -68,13 +68,16 @@ export function initGooReveals(scope = document) {
   })
 }
 
-// a trigger line at (or within a hair of) the page's max scroll can never
-// be crossed — the closing wordmark sat 3px shy of it and stayed hidden
-// forever. Once layout is final, play those outright.
+// Two cases the 88% line can't serve: (a) triggers at the very bottom of
+// the page that can never be crossed (the closing wordmark), and (b)
+// elements already partly visible on load, sitting below the line — they
+// must not wait for a scroll. Play both outright once layout is final.
 export function playUnreachableGoo() {
   const max = ScrollTrigger.maxScroll(window)
   tracked.forEach(({ st, tl }) => {
-    if (st.start > max - 48) { tl.play(); st.kill() }
+    const r = st.trigger.getBoundingClientRect()
+    const visibleNow = r.top < window.innerHeight && r.bottom > 0
+    if (st.start > max - 48 || visibleNow) { tl.play(); st.kill() }
   })
 }
 

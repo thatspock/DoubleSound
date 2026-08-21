@@ -622,7 +622,9 @@ sup { font-size: 0.55em; vertical-align: super; }
 
   /* let the wordmark sit on a deliberate pause above the iOS home bar,
      not get eaten by the dynamic toolbar transition */
-  .footer { --footer-pad-b: max(calc(12rem / var(--sr)), env(safe-area-inset-bottom)); }
+  /* no head-room: at full scroll the manifest sits level with the nav
+     pills, reference-style */
+  .footer { --footer-pad-b: max(calc(12rem / var(--sr)), env(safe-area-inset-bottom)); padding-top: 0; }
 
   /* the giant counter overflows a phone screen at desktop size */
   .pre-count { font-size: calc(96rem / var(--sr)); }
@@ -646,8 +648,8 @@ sup { font-size: 0.55em; vertical-align: super; }
   .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
   /* the entire footer — manifest, timer, wordmark — is one phone screen */
   .footer-grid {
-    padding-top: calc(14rem / var(--sr));
-    min-height: calc(100svh - calc(40rem / var(--sr)) - var(--footer-pad-b));
+    padding-top: calc(8rem / var(--sr));
+    min-height: calc(100svh - var(--footer-pad-b));
     grid-template-rows: auto auto 1fr;
   }
   .f-closing { min-height: 0; }
@@ -667,6 +669,9 @@ sup { font-size: 0.55em; vertical-align: super; }
     grid-area: 1 / 1 / 3 / 3;
     justify-self: start;
     margin-left: calc(64rem / var(--sr) + var(--pad));
+    /* behind the reveal layer: where the rule crosses the stone heart
+       it passes UNDER it and disappears */
+    z-index: -1;
   }
   .sp-s1::after { content: none; }
   .sp-s2 {
