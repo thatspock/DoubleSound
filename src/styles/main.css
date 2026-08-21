@@ -296,9 +296,15 @@ sup { font-size: 0.55em; vertical-align: super; }
   height: calc(184rem / var(--sr));
   border-right: var(--stroke) solid var(--ink-strong);
 }
-.lineup-head { margin-bottom: calc(90rem / var(--sr)); }
-.lh-a { grid-column: 3 / 6; }
-.lh-b { grid-column: 6 / 8; }
+/* the section label is a small category tag pinned to the baseline of
+   the first name, reference-style — not a second giant headline */
+.lineup-tag {
+  grid-area: 1 / 1 / 2 / 2;
+  align-self: end;
+  justify-self: end;
+  padding: 0 var(--line-gap) calc(12rem / var(--sr)) 0;
+  color: var(--ink-strong);
+}
 
 .artist {
   display: flex; align-items: baseline; gap: calc(16rem / var(--sr));
@@ -579,8 +585,7 @@ sup { font-size: 0.55em; vertical-align: super; }
   .p-end { grid-area: 8 / 1 / 9 / 7; }
   .hero-copy { grid-area: 9 / 1 / 10 / 4; margin-bottom: calc(40rem / var(--sr)); }
 
-  .lh-a { grid-column: 1 / 4; }
-  .lh-b { grid-column: 4 / 7; }
+  .lineup-tag { grid-area: 1 / 1 / 2 / 3; align-self: start; justify-self: start; padding: 0 0 calc(6rem / var(--sr)); }
   .artist h1 { font-size: calc(50rem / var(--sr)); }
   .a-1, .a-2, .a-3, .a-4, .a-5 { grid-column: 1 / 7; }
   .pill { transform: translateY(calc(-10rem / var(--sr))); }
@@ -636,7 +641,6 @@ sup { font-size: 0.55em; vertical-align: super; }
      heavy — compress the vertical rhythm across all sections */
   .hero-copy { margin: calc(48rem / var(--sr)) 0 calc(16rem / var(--sr)); }
   .lineup { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
-  .lineup-head { margin-bottom: calc(44rem / var(--sr)); }
   .facts { padding: calc(72rem / var(--sr)) var(--pad) calc(56rem / var(--sr)); }
   .facts-head { margin-bottom: calc(44rem / var(--sr)); }
   .tickets { min-height: 38vh; padding-bottom: calc(24rem / var(--sr)); }
@@ -652,6 +656,23 @@ sup { font-size: 0.55em; vertical-align: super; }
   /* -8rem tracking is fine at 210rem, but at phone scale it collapses
      the wordmark into a smear — keep the same -3.8% of the em instead */
   .f-final h1 { letter-spacing: calc(-2rem / var(--sr)); }
+
+  /* the page rules live on mobile too — segments in the empty air
+     between blocks, reference-style, never crossing a line of type */
+  .spine { display: block; }
+  .sp-s2 { display: none; } /* no clean corridor for it on this layout */
+  .sp-s1 { grid-area: 1 / 3 / 2 / 4; position: relative; }
+  .sp-s1::after {
+    content: '';
+    position: absolute;
+    top: calc(100% - 1px); right: calc(var(--stroke) * -1);
+    height: calc(34vh - 2 * var(--line-gap));
+    border-right: var(--stroke) solid var(--ink-strong);
+  }
+  .sp-s3 { grid-area: 9 / 2 / 10 / 3; }
+  .sp-s3::after { height: calc(104rem / var(--sr)); }
+  .sp-s4 { grid-area: 7 / 2 / 8 / 3; }
+  .sp-s4::after { height: calc(64rem / var(--sr)); }
 
   .sticky-name, .scrollbar { display: none; }
 }
