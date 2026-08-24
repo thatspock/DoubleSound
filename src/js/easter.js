@@ -18,6 +18,10 @@ let lastT = 0
 let logged = false
 let grabbed = null
 const TOUCH = window.matchMedia('(hover: none)').matches
+// field is fixed inset:0 — its size only changes with the viewport. Caching
+// it keeps clientWidth/clientHeight (forced-layout reads) out of the rAF loop.
+let fieldW = 0
+let fieldH = 0
 
 function ensureField() {
   if (field) return field
@@ -25,6 +29,12 @@ function ensureField() {
   field = document.createElement('div')
   field.style.cssText = 'position:fixed;inset:0;overflow:clip;z-index:60;pointer-events:none'
   document.body.appendChild(field)
+  const measure = () => {
+    fieldW = field.clientWidth
+    fieldH = field.clientHeight
+  }
+  measure()
+  window.addEventListener('resize', measure)
 
   document.addEventListener('pointermove', (e) => {
     if (!grabbed) return
@@ -65,8 +75,8 @@ function ensureField() {
 
 function spawn(src, x0, y0, opts = {}) {
   const f = ensureField()
-  const W = f.clientWidth
-  const H = f.clientHeight
+  const W = fieldW
+  const H = fieldH
   const r = (opts.scale ?? 1) * Math.min(H * 0.11, W * 0.09)
   const ar = opts.ar ?? 1
   const hh = r * ar // half-height; (x, y) is the image center
@@ -130,7 +140,10 @@ export function dropHeart(clickX) {
     logged = true
     console.log('%cSTONE HEARTS — catch one if you can', 'color:#609957;background:#1f1f1e;padding:4px 10px;border-radius:10px;font-weight:bold')
   }
-  spawn('/assets/heart-face.webp', clickX, undefined, { ar: AR_HEART })
+  // 0.8: reads clearly smaller than the hero stone; also ~36% fewer layer
+  // pixels per falling body. The sprite is the hero's own image — already
+  // loaded and decoded, a separate downscaled file would COST a request.
+  spawn('/assets/heart-face.webp', clickX, undefined, { ar: AR_HEART, scale: 0.8 })
 }
 
 // facts-row eggs pop out of the clicked row, then fall like everything
@@ -160,8 +173,8 @@ function humpSlope(x, W, H) {
 function tick(t) {
   const dt = Math.min((t - lastT) / 1000, 0.032)
   lastT = t
-  const W = field.clientWidth
-  const H = field.clientHeight
+  const W = fieldW
+  const H = fieldH
 
   for (const h of heads) {
     if (h.grabbedNow) {
