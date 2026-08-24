@@ -1,5 +1,5 @@
-// Easter eggs share one physics world: Ika heads dropped from the heart
-// and flat b/w sprites ejected from the facts rows all obey the same
+// Easter eggs share one physics world: stone hearts dropped from the hero
+// heart and flat b/w sprites ejected from the facts rows all obey the same
 // gravity, roll off the same floor mound, can be grabbed and thrown,
 // bounce off walls/ceiling and only ever leave through the floor.
 
@@ -9,7 +9,7 @@ const REST_WALL = 0.55
 const REST_HEAD = 0.5     // body-vs-body bounciness
 const MAX_ACTIVE = 7      // pile size before bodies start sinking
 const LIFE_MS = 8000      // settled life before a body sinks away
-const AR_IKA = 910 / 842  // head image h/w
+const AR_HEART = 1154 / 1069  // heart-face.webp h/w — the same stone you click
 
 let field = null
 let heads = []
@@ -125,12 +125,12 @@ function spawn(src, x0, y0, opts = {}) {
   }
 }
 
-export function dropIka(clickX) {
+export function dropHeart(clickX) {
   if (!logged) {
     logged = true
-    console.log('%cIKA ON THE DECKS — catch him if you can', 'color:#609957;background:#1f1f1e;padding:4px 10px;border-radius:10px;font-weight:bold')
+    console.log('%cSTONE HEARTS — catch one if you can', 'color:#609957;background:#1f1f1e;padding:4px 10px;border-radius:10px;font-weight:bold')
   }
-  spawn('/assets/head-ika.webp', clickX, undefined, { ar: AR_IKA })
+  spawn('/assets/heart-face.webp', clickX, undefined, { ar: AR_HEART })
 }
 
 // facts-row eggs pop out of the clicked row, then fall like everything

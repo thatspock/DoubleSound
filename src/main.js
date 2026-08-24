@@ -10,7 +10,7 @@ import { initGooReveals, playUnreachableGoo } from './js/goo.js'
 import { runPreloader } from './js/preloader.js'
 import { initFluidReveal } from './js/fluid.js'
 import { initCountdown } from './js/countdown.js'
-import { dropIka, dropEgg } from './js/easter.js'
+import { dropHeart, dropEgg } from './js/easter.js'
 import { moveHint, showHint, hideHint } from './js/hint.js'
 import { bootLog } from './js/boot-log.js'
 import { initAudio } from './js/audio.js'
@@ -293,9 +293,9 @@ initSfx()
 initAudio()
 initCountdown()
 initGooReveals()
-initFluidReveal({ onHeartClick: dropIka })
-// mobile: the static heart drops heads too
-document.querySelector('.heart-static')?.addEventListener('click', (e) => dropIka(e.clientX))
+initFluidReveal({ onHeartClick: dropHeart })
+// mobile: the static heart drops stone hearts too
+document.querySelector('.heart-static')?.addEventListener('click', (e) => dropHeart(e.clientX))
 
 runPreloader().then(() => {
   // belt and braces: whatever restored the position while the preloader
